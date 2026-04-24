@@ -31,7 +31,7 @@ The easiest way to get Horizon running is via Docker Compose.
    ```yaml
    services:
      horizon:
-       image: ghcr.io/dimmanramone/horizon:latest
+       image: ghcr.io/weirdtales/horizon:latest
        container_name: horizon
        ports:
          - "3000:3000"
@@ -51,7 +51,7 @@ The easiest way to get Horizon running is via Docker Compose.
 
 1. **Clone & Install**:
    ```bash
-   git clone https://github.com/dimmanramone/horizon.git
+   git clone https://github.com/weirdtales/horizon.git
    cd horizon
    npm install
    ```
@@ -125,4 +125,4 @@ This project was built using modern, agentic coding workflows. A significant por
 
 ---
 
-Built with ❤️ by [dimmanramone](https://github.com/dimmanramone)
+Built with ❤️ by [Weirdtales](https://github.com/weirdtales)

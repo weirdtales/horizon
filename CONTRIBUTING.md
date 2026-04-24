@@ -5,12 +5,12 @@ First off, thank you for considering contributing to Horizon! It's people like y
 ## 🌈 How Can I Contribute?
 
 ### Reporting Bugs
-- Check the [Issues](https://github.com/dimmanramone/horizon/issues) to see if the bug has already been reported.
-- If you can't find an open issue addressing the problem, [open a new one](https://github.com/dimmanramone/horizon/issues/new).
+- Check the [Issues](https://github.com/weirdtales/horizon/issues) to see if the bug has already been reported.
+- If you can't find an open issue addressing the problem, [open a new one](https://github.com/weirdtales/horizon/issues/new).
 - Include a clear title, a description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
 
 ### Suggesting Enhancements
-- Open a [new issue](https://github.com/dimmanramone/horizon/issues/new) with the tag `enhancement`.
+- Open a [new issue](https://github.com/weirdtales/horizon/issues/new) with the tag `enhancement`.
 - Describe the feature you would like to see and why it would be useful.
 
 ### Pull Requests
