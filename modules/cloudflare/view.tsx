@@ -74,7 +74,6 @@ export default function CloudflareView() {
 
     const handleDeleteRecord = async (recordId: string) => {
         if (!selectedZone) return;
-        if (!confirm('Are you sure you want to delete this Cloudflare record?')) return;
         
         setSaving(true);
         setLocalError(null);
@@ -89,7 +88,7 @@ export default function CloudflareView() {
             
             await refetchDNS();
         } catch (err: unknown) {
-            alert(err instanceof Error ? err.message : 'An unknown error occurred');
+            setLocalError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }
@@ -272,6 +271,7 @@ export default function CloudflareView() {
                                         onClick={() => { setEditingRecord(record); setIsAdding(false); }}
                                         className="m3-press-effect"
                                         style={{ background: 'none', border: 'none', color: 'inherit', opacity: 0.5, cursor: 'pointer' }}
+                                        aria-label={`Edit ${record.type} record for ${record.name}`}
                                     >
                                         <Pencil size={18} />
                                     </button>
@@ -279,6 +279,7 @@ export default function CloudflareView() {
                                         onClick={() => { if (record.id) handleDeleteRecord(record.id); }}
                                         className="m3-press-effect"
                                         style={{ background: 'none', border: 'none', color: 'var(--md-sys-color-error)', opacity: 0.5, cursor: 'pointer' }}
+                                        aria-label={`Delete ${record.type} record for ${record.name}`}
                                     >
                                         <Trash2 size={18} />
                                     </button>

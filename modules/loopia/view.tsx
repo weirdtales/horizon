@@ -46,6 +46,13 @@ export default function LoopiaView() {
 
     const handleSaveRecord = async (record: DNSRecord) => {
         if (!selectedDomain || !selectedSubdomain) return;
+        
+        // Validation
+        if (!record.rdata) {
+            setLocalError('Record value (RData) is required');
+            return;
+        }
+
         setSaving(true);
         setLocalError(null);
         try {
@@ -74,7 +81,6 @@ export default function LoopiaView() {
 
     const handleDeleteRecord = async (recordId: number) => {
         if (!selectedDomain || !selectedSubdomain) return;
-        if (!confirm('Are you sure you want to delete this DNS record?')) return;
         
         setSaving(true);
         setLocalError(null);
@@ -93,7 +99,7 @@ export default function LoopiaView() {
             
             await refetchRecords();
         } catch (err: unknown) {
-            alert(err instanceof Error ? err.message : 'An unknown error occurred');
+            setLocalError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }

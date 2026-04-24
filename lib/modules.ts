@@ -22,7 +22,7 @@ export interface ConfigField {
     label: string;
     type: 'text' | 'password' | 'number' | 'url';
     placeholder?: string;
-    defaultValue?: unknown;
+    defaultValue: unknown;
     helpText?: string;
 }
 

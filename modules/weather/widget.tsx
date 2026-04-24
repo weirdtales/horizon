@@ -92,9 +92,9 @@ function useWeather(settings: AppSettings['weather']) {
                         setWeatherData(null);
                     }
                 }
-            } catch (err) {
-                if ((err as Error).name !== 'AbortError') {
-                    console.error('Weather fetch failed:', err);
+            } catch (err: unknown) {
+                if (err instanceof Error && err.name !== 'AbortError') {
+                    console.error('Weather fetch failed:', err.message);
                     setWeatherData(null);
                 }
             } finally {

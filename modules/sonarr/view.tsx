@@ -179,6 +179,10 @@ export default function SonarrView() {
                                     alt={series.title} 
                                     fill
                                     style={{ objectFit: 'cover' }}
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = 'https://raw.githubusercontent.com/Sonarr/Sonarr/develop/src/Sonarr.GUI/Content/Images/logo.png';
+                                    }}
                                     unoptimized
                                 />
                                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)' }} />

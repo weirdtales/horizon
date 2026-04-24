@@ -74,13 +74,15 @@ export default function PlexWidget() {
                   {activeSession ? (
                         <div style={{ width: '100%', background: 'var(--md-sys-color-surface-container-highest)', backdropFilter: 'blur(20px)', borderRadius: '24px', padding: '14px', border: '1px solid var(--md-sys-color-outline-variant)', display: 'flex', gap: '16px', alignItems: 'center', animation: 'fadeIn 0.6s var(--md-sys-motion-easing-emphasized)', transition: 'background-color 0.3s ease' }}>
                               <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 8px 24px rgba(0,0,0,0.2)', border: '1px solid var(--md-sys-color-outline-variant)', position: 'relative' }}>
-                                <Image 
-                                    src={sanitizeUrl(activeSession.thumb, '')} 
-                                    alt={activeSession.title} 
-                                    fill
-                                    style={{ objectFit: 'cover' }}
-                                    unoptimized
-                                />
+                                {activeSession.thumb && (
+                                    <Image 
+                                        src={`/api/plex/library/${activeSession.librarySectionID}/metadata?path=${encodeURIComponent(activeSession.thumb)}`}
+                                        alt={activeSession.title} 
+                                        fill
+                                        style={{ objectFit: 'cover' }}
+                                        unoptimized
+                                    />
+                                )}
                             </div>
                             <div style={{ minWidth: 0, flex: 1 }}>
                                 <div style={{ fontSize: '9px', fontWeight: 900, color: '#eab308', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>LIVE STREAMING</div>

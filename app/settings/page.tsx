@@ -70,7 +70,7 @@ export default function SettingsPage() {
     const [editingIconId, setEditingIconId] = useState<string | null>(null);
     const [iconSearch, setIconSearch] = useState('');
     const [isAddingItem, setIsAddingItem] = useState(false);
-    const [newItem, setNewItem] = useState<Partial<NavItem>>({ label: '', path: '', icon: 'Link', visible: true, isIframe: false });
+    const [newItem, setNewItem] = useState<Partial<NavItem>>({ label: '', path: '', icon: 'LinkIcon', visible: true, isIframe: false });
     const [editingPlugin, setEditingPlugin] = useState<ModuleManifest | null>(null);
 
     // Bookmark State
@@ -94,11 +94,11 @@ export default function SettingsPage() {
                 method: 'POST',
                 body: formData
             });
-            let data: any = {};
+            let data: { message?: string; error?: string } = {};
             try {
                 data = await res.json();
-            } catch (e) {
-                console.error('[Upload Parse Error]:', e);
+            } catch (_e) {
+                console.error('[Upload Parse Error]:', _e);
             }
 
             if (res.ok) {
@@ -108,7 +108,7 @@ export default function SettingsPage() {
             } else {
                 setToast({ message: data.error || `Upload failed (Status: ${res.status})`, type: 'error' });
             }
-        } catch (err) {
+        } catch (_err) {
             setToast({ message: 'Network error during plugin installation.', type: 'error' });
         } finally {
             setUploading(false);
@@ -126,13 +126,13 @@ export default function SettingsPage() {
                 setToast({ message: 'Plugin uninstalled successfully.', type: 'success' });
                 setTimeout(() => window.location.reload(), 1000);
             } else {
-                let data: any = {};
+                let data: { error?: string } = {};
                 try {
                     data = await res.json();
-                } catch (e) {}
+                } catch (_e) {}
                 setToast({ message: data.error || `Failed to uninstall plugin (Status: ${res.status}).`, type: 'error' });
             }
-        } catch (err) {
+        } catch (_err) {
             setToast({ message: 'Network error during uninstallation.', type: 'error' });
         }
     };
@@ -165,7 +165,7 @@ export default function SettingsPage() {
     const [plexAuth, setPlexAuth] = useState<{ id: string, code: string, expires_at: string } | null>(null);
     const [plexAuthStatus, setPlexAuthStatus] = useState<'idle' | 'linking' | 'success' | 'error' | 'discovery'>('idle');
     const [plexPolling, setPlexPolling] = useState(false);
-    const [discoveredServers, setDiscoveredServers] = useState<any[]>([]);
+    const [discoveredServers, setDiscoveredServers] = useState<Array<{ id: string; name: string; url: string; machineId: string; token: string }>>([]);
 
     useEffect(() => {
         let pollInterval: NodeJS.Timeout;
@@ -219,7 +219,7 @@ export default function SettingsPage() {
                                 setToast({ message: `Linked to ${srv.name}!`, type: 'success' });
                             } else {
                                 // Multi-server discovery
-                                setDiscoveredServers(servers.map((s: any) => ({ ...s, token: data.authToken })));
+                                setDiscoveredServers(servers.map((s: { id: string; name: string; url: string; machineId: string; token: string }) => ({ ...s, token: data.authToken })));
                                 setPlexAuthStatus('discovery');
                             }
                         } catch (err) {
@@ -321,7 +321,7 @@ export default function SettingsPage() {
     const handleInputChange = (section: string, field: string, value: string) => {
         setSettings((prev) => {
             if (!prev) return prev;
-            const sectionData = (prev as any)[section] || {};
+            const sectionData = (prev as unknown as Record<string, Record<string, unknown>>)[section] || {};
             const next = {
                 ...prev,
                 [section]: {
@@ -458,9 +458,9 @@ export default function SettingsPage() {
         });
     };
 
-    const handleSave = async (explicitSettings?: AppSettings) => {
+    const handleSave = React.useCallback(async (explicitSettings?: AppSettings) => {
         // Defensive check: if the first argument is a React Event, ignore it
-        const settingsToSave = (explicitSettings && !(explicitSettings as any).nativeEvent) ? explicitSettings : settings;
+        const settingsToSave = (explicitSettings && !(explicitSettings as unknown as { nativeEvent?: unknown }).nativeEvent) ? explicitSettings : settings;
         
         if (!settingsToSave) {
             setToast({ message: 'Engine still initializing. Please wait.', type: 'error' });
@@ -492,7 +492,7 @@ export default function SettingsPage() {
             setSaving(false);
         }
         return true;
-    };
+    }, [settings]);
 
     const removeBookmark = (id: string) => {
         setSettings((prev) => {
@@ -1100,7 +1100,7 @@ export default function SettingsPage() {
                                 </div>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', borderRadius: 'var(--md-sys-shape-corner-large)', overflow: 'hidden' }}>
-                                    {settings.bookmarks?.map((b: any) => (
+                                    {settings.bookmarks?.map((b: Bookmark) => (
                                         <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px', backgroundColor: 'var(--md-sys-color-surface-container)' }}>
                                             <div style={{ backgroundColor: `${b.color}22`, padding: '10px', borderRadius: 'var(--md-sys-shape-corner-medium)' }}>
                                                 <DashboardIcon icon={b.icon} size={18} color={b.color} />
@@ -1169,7 +1169,7 @@ export default function SettingsPage() {
                             </div>
                             <section style={{ backgroundColor: 'var(--md-sys-color-surface-container)', borderRadius: 'var(--md-sys-shape-corner-extra-large)', padding: '32px' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {settings.navigation.filter((item: NavItem) => item.id !== 'settings' && item.id !== 'dashboard').map((item: NavItem, idx: number, arr: any[]) => (
+                                    {settings.navigation.filter((item: NavItem) => item.id !== 'settings' && item.id !== 'dashboard').map((item: NavItem, idx: number, arr: NavItem[]) => (
                                         <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--md-sys-shape-corner-large)' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                                 <button 
@@ -1260,17 +1260,16 @@ export default function SettingsPage() {
                                     }}>
                                         {(() => {
                                         const coreIds = ['sonarr', 'radarr', 'plex', 'weather'];
-                                        const sortedModules = [...(MODULE_MANIFESTS as ModuleManifest[])]
-                                            .filter(m => !m.hidden)
-                                            .sort((a, b) => {
+                                        return [...(MODULE_MANIFESTS as ModuleManifest[])]
+                                            .filter((m: ModuleManifest) => !m.hidden)
+                                            .sort((a: ModuleManifest, b: ModuleManifest) => {
                                                 const aCore = coreIds.includes(a.id);
                                                 const bCore = coreIds.includes(b.id);
                                                 if (aCore && !bCore) return -1;
                                                 if (!aCore && bCore) return 1;
                                                 return a.name.localeCompare(b.name);
-                                            });
-
-                                        return sortedModules.map(m => {
+                                            })
+                                            .map((m: ModuleManifest) => {
                                             const isEnabled = settings?.modules?.[m.id]?.enabled === true;
                                             return (
                                                 <div key={m.id} style={{ 
@@ -1425,7 +1424,7 @@ export default function SettingsPage() {
 
                                     {(isChangelogExpanded ? (changelogData || []).slice(0, 5) : (changelogData || []).slice(0, 1))
                                         .filter(Boolean)
-                                        .map((release: any, idx: number) => (
+                                        .map((release: { version: string; date: string; changes: string[] }, idx: number) => (
                                             <div key={release.version} style={{ 
                                                 padding: '24px', 
                                                 backgroundColor: idx === 0 ? 'var(--md-sys-color-surface-container-highest)' : 'rgba(255,255,255,0.02)', 
@@ -1537,31 +1536,25 @@ export default function SettingsPage() {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }}>
-                        {discoveredServers.map(srv => (
-                            <div 
-                                key={srv.machineId}
-                                onClick={() => handleSelectServer(srv)}
-                                style={{ 
-                                    padding: '20px', borderRadius: '20px', backgroundColor: 'var(--md-sys-color-surface-container-highest)', 
-                                    border: '1px solid var(--md-sys-color-outline-variant)', cursor: 'pointer', transition: 'all 0.3s ease',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-                                }}
-                                className="m3-press-effect"
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--md-sys-color-primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--md-sys-color-on-primary-container)' }}>
-                                        <Database size={24} />
+                            {discoveredServers.map((srv) => (
+                                <button 
+                                    key={srv.id}
+                                    onClick={() => handleSelectServer(srv)}
+                                    className="m3-press-effect"
+                                    style={{ width: '100%', padding: '16px', background: 'var(--md-sys-color-surface-container)', borderRadius: '16px', border: '1px solid var(--md-sys-color-outline-variant)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                        <div style={{ backgroundColor: 'var(--md-sys-color-primary-container)', color: 'var(--md-sys-color-primary)', padding: '10px', borderRadius: '12px' }}>
+                                            <Server size={18} />
+                                        </div>
+                                        <div style={{ textAlign: 'left' }}>
+                                            <div style={{ fontWeight: 800 }}>{srv.name}</div>
+                                            <div style={{ fontSize: '11px', opacity: 0.5 }}>{srv.url}</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div style={{ fontWeight: 800, fontSize: '15px' }}>{srv.name}</div>
-                                        <div style={{ fontSize: '11px', opacity: 0.5 }}>{srv.productVersion} • {srv.platform}</div>
-                                    </div>
-                                </div>
-                                <div style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'var(--md-sys-color-surface-container-high)' }}>
-                                    <ChevronRight size={14} />
-                                </div>
-                            </div>
-                        ))}
+                                    <ChevronRight size={18} opacity={0.3} />
+                                </button>
+                            ))}
                     </div>
 
                     <button 
@@ -1727,15 +1720,15 @@ export default function SettingsPage() {
                                         setNewItem({ ...newItem, icon });
                                     } else if (editingIconId.startsWith('bm-')) {
                                         // It's a bookmark (this part of the code might be elsewhere but for safety)
-                                        setSettings((prev: any) => ({
+                                        setSettings((prev: AppSettings) => ({
                                             ...prev,
-                                            bookmarks: prev.bookmarks.map((b: any) => b.id === editingIconId ? { ...b, icon } : b)
+                                            bookmarks: prev.bookmarks.map((b: Bookmark) => b.id === editingIconId ? { ...b, icon } : b)
                                         }));
                                     } else {
                                         // It's a navigation item
-                                        setSettings((prev: any) => ({
+                                        setSettings((prev: AppSettings) => ({
                                             ...prev,
-                                            navigation: prev.navigation.map((n: any) => n.id === editingIconId ? { ...n, icon } : n)
+                                            navigation: prev.navigation.map((n: NavItem) => n.id === editingIconId ? { ...n, icon } : n)
                                         }));
                                     }
                                     setEditingIconId(null);

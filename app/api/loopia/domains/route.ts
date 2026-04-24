@@ -11,7 +11,7 @@ export async function GET() {
                 domain: d.domain || 'unknown',
                 status: 'OK',
             };
-        }).filter((d: { domain: string }) => d.domain !== 'unknown');
+        }).filter((d: { domain: string }) => typeof d.domain === 'string' && d.domain !== 'unknown');
 
         return NextResponse.json({ 
             domains: domainsWithMeta,

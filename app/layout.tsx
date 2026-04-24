@@ -8,6 +8,7 @@ import { NavItem } from '@/lib/settings';
 import { DashboardIcon } from './components/DashboardIcon';
 import { Menu, X } from 'lucide-react';
 import { sanitizeUrl } from '@/lib/url';
+import type { ModuleManifest } from '@/lib/registry';
 
 interface HorizonLogoProps {
     accentColor?: string;
@@ -73,8 +74,8 @@ export default function RootLayout({
 }) {
     const pathname = usePathname();
     const [navItems, setNavItems] = useState<NavItem[]>([]);
-    const [bgImage, setBgImage] = useState<string | null>(null);
-    const [bgColor, setBgColor] = useState<string | null>(null);
+    const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+    const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
     const [isEmbedded, setIsEmbedded] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [currentAccent, setCurrentAccent] = useState('var(--md-sys-color-primary)');
@@ -86,8 +87,8 @@ export default function RootLayout({
                 if (data.settings) {
                     if (data.settings.navigation) {
                         const modularNavItems = MODULE_MANIFESTS
-                            .filter((m: any) => MODULE_VIEWS[m.id] && ((data.settings.modules as any)?.[m.id]?.enabled === true) && !m.hidden)
-                            .map((m: any) => ({
+                            .filter((m: ModuleManifest) => MODULE_VIEWS[m.id] && ((data.settings.modules as Record<string, { enabled: boolean }>)?.[m.id]?.enabled === true) && !m.hidden)
+                            .map((m: ModuleManifest) => ({
                                 id: m.id,
                                 label: m.name,
                                 icon: m.icon,
@@ -103,9 +104,9 @@ export default function RootLayout({
                         setNavItems(combinedNav);
                     }
                     
-                    const { theme, accentColor, backgroundImage, backgroundColor, dayStart = 7, nightStart = 19 } = data.settings.appearance || { theme: 'system', accentColor: 'blue', backgroundImage: null, backgroundColor: null };
-                    if (backgroundImage) setBgImage(sanitizeUrl(backgroundImage));
-                    if (backgroundColor) setBgColor(backgroundColor);
+                    const { theme, accentColor, backgroundImage: bgImg, backgroundColor: bgCol, dayStart = 7, nightStart = 19 } = data.settings.appearance || { theme: 'system', accentColor: 'blue', backgroundImage: null, backgroundColor: null };
+                    if (bgImg) setBackgroundImage(sanitizeUrl(bgImg));
+                    if (bgCol) setBackgroundColor(bgCol);
                     
                     const applyTheme = () => {
                         let effectiveTheme = theme;
@@ -290,8 +291,8 @@ export default function RootLayout({
             </head>
             <body>
                 <div className="app-layout" style={{ 
-                    backgroundColor: (bgColor && bgColor !== 'transparent' && bgColor !== '#111318' && bgColor !== '#1a1c22' && bgColor !== '#0f1117' && bgColor !== '#12141a') ? bgColor : undefined,
-                    backgroundImage: bgImage ? `url(${bgImage})` : 'none',
+                    backgroundColor: (backgroundColor && backgroundColor !== 'transparent' && backgroundColor !== '#111318' && backgroundColor !== '#1a1c22' && backgroundColor !== '#0f1117' && backgroundColor !== '#12141a') ? backgroundColor : undefined,
+                    backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',

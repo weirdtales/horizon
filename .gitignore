@@ -48,5 +48,6 @@ next-env.d.ts
 .claude/
 scratch/
 lint_results*.txt
+lint_output*.txt
 .DS_Store
 Thumbs.db

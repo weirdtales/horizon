@@ -57,7 +57,8 @@ export async function GET() {
                         count: parseInt(data.MediaContainer?.totalSize || '0'),
                         updatedAt: d.updatedAt
                     };
-                } catch {
+                } catch (err) {
+                    console.error(`Failed to fetch count for Plex library ${d.title} (${d.key}):`, err);
                     return { id: d.key, title: d.title, type: d.type, count: 0, updatedAt: d.updatedAt };
                 }
             })

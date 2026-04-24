@@ -59,8 +59,6 @@ export type AppSettings = {
         showHeaderStats?: boolean;
         userName?: string;
         bgType?: 'color' | 'image' | 'default';
-        bgImage?: string;
-        bgColor?: string;
         backgroundColor?: string;
         backgroundImage?: string;
         dayStart?: number;

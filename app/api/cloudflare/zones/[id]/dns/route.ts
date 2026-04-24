@@ -101,14 +101,27 @@ export async function POST(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id: zoneId } = await params;
+    const { id } = await params;
     const settings = await getSettings();
     const cf = settings.cloudflare;
     if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
 
     try {
         const body = await request.json();
-        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
+        
+        if (body.record_id) {
+            const { record_id, ...record } = body;
+            const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${id}/dns_records/${record_id}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(record)
+            });
+            const data = await res.json();
+            if (!res.ok) return NextResponse.json(data, { status: res.status });
+            return NextResponse.json(data);
+        }
+
+        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${id}/dns_records`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -131,7 +144,12 @@ export async function PATCH(
     if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
 
     try {
-        const { record_id, ...record } = await request.json();
+        const body = await request.json();
+        if (!body.record_id) {
+            return NextResponse.json({ error: 'record_id is required' }, { status: 400 });
+        }
+        
+        const { record_id, ...record } = body;
         const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${record_id}`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' },
@@ -155,8 +173,12 @@ export async function DELETE(
     if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
 
     try {
-        const { record_id } = await request.json();
-        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${record_id}`, {
+        const body = await request.json();
+        if (!body.record_id) {
+            return NextResponse.json({ error: 'record_id is required' }, { status: 400 });
+        }
+
+        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${body.record_id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' }
         });

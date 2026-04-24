@@ -348,7 +348,7 @@ export default function DashboardHub() {
     }, [editMode]);
 
 
-    const handleResizeStop = useCallback((layout: readonly DashboardLayoutItem[], oldItem: any, newItem: any) => {
+    const handleResizeStop = useCallback((layout: readonly DashboardLayoutItem[], oldItem: DashboardLayoutItem, newItem: DashboardLayoutItem) => {
         if (!editMode) return;
         setWidgetSizes(prev => ({
             ...prev,
@@ -362,10 +362,10 @@ export default function DashboardHub() {
     const greeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
 
 
-    const appearance = settings?.appearance || {} as any;
-    const dashboardBgStyle: React.CSSProperties = appearance.bgType === 'image' && appearance.bgImage 
-        ? { backgroundImage: `url(${appearance.bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', backgroundColor: 'transparent' }
-        : { backgroundColor: (appearance.bgColor && appearance.bgColor !== 'transparent' && appearance.bgColor !== '#111318' && appearance.bgColor !== '#1a1c22' && appearance.bgColor !== '#0f1117') ? appearance.bgColor : undefined, backgroundImage: 'none' };
+    const appearance = settings?.appearance || {} as AppSettings['appearance'];
+    const dashboardBgStyle: React.CSSProperties = appearance.bgType === 'image' && appearance.backgroundImage 
+        ? { backgroundImage: `url(${appearance.backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', backgroundColor: 'transparent' }
+        : { backgroundColor: (appearance.backgroundColor && appearance.backgroundColor !== 'transparent' && appearance.backgroundColor !== '#111318' && appearance.backgroundColor !== '#1a1c22' && appearance.backgroundColor !== '#0f1117') ? appearance.backgroundColor : undefined, backgroundImage: 'none' };
 
     return (
         <main 
