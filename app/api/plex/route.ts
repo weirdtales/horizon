@@ -1,31 +1,55 @@
 import { NextResponse } from 'next/server';
 import { getPlexConnection, cachedPlexFetch } from '@/lib/plex';
 
+interface PlexDirectory {
+    key: string;
+    title: string;
+    type: string;
+    updatedAt: number;
+}
+
+interface PlexMediaContainer {
+    MediaContainer: {
+        Directory?: PlexDirectory[];
+        Metadata?: PlexMetadata[];
+        totalSize?: string;
+    };
+}
+
+interface PlexMetadata {
+    title: string;
+    parentTitle?: string;
+    grandparentTitle?: string;
+    User?: { title: string };
+    Player?: { title: string; state: string };
+    type: string;
+    viewOffset?: number;
+    duration?: number;
+    thumb?: string;
+    art?: string;
+}
+
 export async function GET() {
     try {
         // Use shared logic for discovery and healing
         const { url, headers, identity, healed } = await getPlexConnection();
 
         // Fetch Data using cached helper (60s TTL)
-        const [sessionsData, libraryData] = await Promise.all([
+        const [sessionsDataRaw, libraryDataRaw] = await Promise.all([
             cachedPlexFetch(`${url}/status/sessions`, headers),
             cachedPlexFetch(`${url}/library/sections`, headers)
         ]);
 
-        interface PlexDirectory {
-            key: string;
-            title: string;
-            type: string;
-            updatedAt: number;
-        }
+        const sessionsData = sessionsDataRaw as unknown as PlexMediaContainer;
+        const libraryData = libraryDataRaw as unknown as PlexMediaContainer;
 
-        const directories = (libraryData as any).MediaContainer?.Directory || [];
+        const directories = libraryData.MediaContainer?.Directory || [];
 
         // Fetch counts for libraries (Cache individual library responses too)
         const detailedLibraries = await Promise.all(
             directories.slice(0, 5).map(async (d: PlexDirectory) => {
                 try {
-                    const data = await cachedPlexFetch(`${url}/library/sections/${d.key}/all?X-Plex-Container-Start=0&X-Plex-Container-Size=0`, headers);
+                    const data = await cachedPlexFetch(`${url}/library/sections/${d.key}/all?X-Plex-Container-Start=0&X-Plex-Container-Size=0`, headers) as unknown as PlexMediaContainer;
                     return {
                         id: d.key,
                         title: d.title,
@@ -49,7 +73,7 @@ export async function GET() {
                 platform: identity?.platform || 'Unknown',
                 machineId: identity?.machineIdentifier || 'unknown-id',
             },
-            sessions: (sessionsData as any).MediaContainer?.Metadata?.map((m: any) => ({
+            sessions: sessionsData.MediaContainer?.Metadata?.map((m: PlexMetadata) => ({
                 title: m.title,
                 parentTitle: m.parentTitle || m.grandparentTitle,
                 user: m.User?.title,

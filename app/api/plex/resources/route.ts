@@ -1,5 +1,30 @@
 import { NextResponse } from 'next/server';
 
+interface PlexConnection {
+    uri: string;
+    local: boolean;
+    address: string;
+    relay: boolean;
+}
+
+interface PlexResource {
+    provides: string;
+    name: string;
+    product: string;
+    productVersion: string;
+    platform: string;
+    clientIdentifier: string;
+    connections: PlexConnection[];
+}
+
+interface CleanConnection {
+    url: string;
+    local: boolean;
+    address: string;
+    relay: boolean;
+    protocol: string;
+}
+
 export async function POST(request: Request) {
     try {
         const { token } = await request.json();
@@ -21,15 +46,15 @@ export async function POST(request: Request) {
             throw new Error(`Plex Resources API: ${res.status}`);
         }
 
-        const data = await res.json();
+        const data: PlexResource[] = await res.json();
         
         // Filter for Plex Media Servers and map to a clean format
         const servers = data
-            .filter((item: any) => item.provides && item.provides.includes('server'))
-            .map((s: any) => {
+            .filter(item => item.provides && item.provides.includes('server'))
+            .map(s => {
                 // Find all unique connections - Guard against missing connections array
                 const connArray = Array.isArray(s.connections) ? s.connections : [];
-                const connections = connArray.map((c: any) => ({
+                const connections: CleanConnection[] = connArray.map(c => ({
                     url: c.uri,
                     local: c.local,
                     address: c.address,
@@ -43,10 +68,10 @@ export async function POST(request: Request) {
                 // 3. Remote HTTPS (Direct remote access)
                 // 4. Relay (Slow but guaranteed fallback)
                 const bestConnection = 
-                    connections.find((c: any) => c.local && c.protocol === 'http') ||
-                    connections.find((c: any) => c.local && c.protocol === 'https') ||
-                    connections.find((c: any) => !c.local && !c.relay) ||
-                    connections.find((c: any) => c.relay) ||
+                    connections.find(c => c.local && c.protocol === 'http') ||
+                    connections.find(c => c.local && c.protocol === 'https') ||
+                    connections.find(c => !c.local && !c.relay) ||
+                    connections.find(c => c.relay) ||
                     connections[0];
 
                 return {
@@ -56,7 +81,7 @@ export async function POST(request: Request) {
                     platform: s.platform,
                     machineId: s.clientIdentifier,
                     url: bestConnection?.url,
-                    connections: connections.sort((a: any, b: any) => {
+                    connections: connections.sort((a, b) => {
                         // Sort by priority for the resolver
                         if (a.local && !b.local) return -1;
                         if (!a.local && b.local) return 1;
@@ -69,15 +94,16 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ servers });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
+        const error = err as Error & { cause?: { message: string } };
         console.error('Plex Discovery Error Detail:', {
-            message: err.message,
-            cause: err.cause
+            message: error.message,
+            cause: error.cause
         });
         return NextResponse.json({ 
             error: 'Discovery Failed', 
-            details: err.message,
-            cause: err.cause?.message
+            details: error.message,
+            cause: error.cause?.message
         }, { status: 500 });
     }
 }

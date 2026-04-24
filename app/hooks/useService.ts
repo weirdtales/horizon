@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
  * useService - Universal hook for dashboard widgets to fetch live API data.
  * Handles loading, error states, and auto-refreshing.
  */
-export function useService(endpoint: string, intervalMs: number = 45000) {
-    const [data, setData] = useState<any>(null);
+export function useService<T = any>(endpoint: string, intervalMs: number = 45000) {
+    const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async (signal?: AbortSignal) => {
         try {
@@ -17,14 +17,18 @@ export function useService(endpoint: string, intervalMs: number = 45000) {
             const json = await res.json();
             
             if (json.error || json.status === 'offline') {
-                setError(json.details || json.error || true);
+                setError(json.details || json.error || 'Service offline');
             } else {
                 setData(json);
                 setError(null);
             }
-        } catch (err: any) {
-            if (err.name === 'AbortError') return;
-            setError(err.message || true);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                if (err.name === 'AbortError') return;
+                setError(err.message);
+            } else {
+                setError(String(err));
+            }
         } finally {
             setLoading(false);
         }

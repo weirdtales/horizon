@@ -2,13 +2,10 @@
 
 import React, { useState } from 'react';
 import { 
-    Cloud, Shield, Lock, Globe, ArrowLeft, RefreshCw, BarChart3, 
-    Activity, ShieldCheck, Zap, ExternalLink, Loader2, AlertCircle,
-    ChevronRight, CheckCircle2, XCircle, ChevronLeft, Layers, Info, 
-    Trash2, Pencil, Plus, Save, X
+    Shield, Globe, ShieldCheck, Zap, Loader2, AlertCircle,
+    ChevronRight, CheckCircle2, ChevronLeft, Pencil, Plus, Save, X,
+    Trash2
 } from 'lucide-react';
-import Link from 'next/link';
-import { BackButton } from '@/app/components/BackButton';
 import { useService } from '@/app/hooks/useService';
 import { useMobile } from '@/app/hooks/useMobile';
 
@@ -21,20 +18,31 @@ interface CFRecord {
     ttl: number;
 }
 
+interface CFDomain {
+    id: string;
+    name: string;
+    status: string;
+    plan: string;
+    metrics?: {
+        requests: number;
+        bandwidth: number;
+    };
+}
+
 export default function CloudflareView() {
     const isMobile = useMobile(1024);
-    const [selectedZone, setSelectedZone] = useState<any | null>(null);
+    const [selectedZone, setSelectedZone] = useState<CFDomain | null>(null);
     
     // CRUD state
     const [editingRecord, setEditingRecord] = useState<CFRecord | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [localError, setLocalError] = useState<string | null>(null);
 
     const { data, loading, error: globalError, refetch } = useService('cloudflare', 60000);
     
     // DNS Records fetcher
-    const { data: dnsData, loading: dnsLoading, error: dnsError, refetch: refetchDNS } = useService(
+    const { data: dnsData, loading: dnsLoading, refetch: refetchDNS } = useService(
         selectedZone ? `cloudflare/zones/${selectedZone.id}/dns` : 'cloudflare',
         selectedZone ? 60000 : 9999999
     );
@@ -42,7 +50,7 @@ export default function CloudflareView() {
     const handleSaveRecord = async (record: CFRecord) => {
         if (!selectedZone) return;
         setSaving(true);
-        setError(null);
+        setLocalError(null);
         try {
             const method = record.id ? 'PATCH' : 'POST';
             const body = record.id ? { record_id: record.id, ...record } : record;
@@ -57,8 +65,8 @@ export default function CloudflareView() {
             await refetchDNS();
             setEditingRecord(null);
             setIsAdding(false);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setLocalError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }
@@ -69,7 +77,7 @@ export default function CloudflareView() {
         if (!confirm('Are you sure you want to delete this Cloudflare record?')) return;
         
         setSaving(true);
-        setError(null);
+        setLocalError(null);
         try {
             const res = await fetch(`/api/cloudflare/zones/${selectedZone.id}/dns`, {
                 method: 'DELETE',
@@ -80,8 +88,8 @@ export default function CloudflareView() {
             if (!res.ok) throw new Error(resData.error || 'Failed to delete record');
             
             await refetchDNS();
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }
@@ -125,18 +133,19 @@ export default function CloudflareView() {
     }
 
     const renderRecordDialog = () => {
+        if (!selectedZone) return null;
         const record = editingRecord || { type: 'A', name: selectedZone.name, content: '', proxied: true, ttl: 1 };
         return (
             <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                 <div className="md3-card-elevated" style={{ width: '100%', maxWidth: '400px', background: 'var(--md-sys-color-surface-container-high)', borderRadius: '32px', padding: '32px', boxShadow: 'var(--md-sys-elevation-5)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                         <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{isAdding ? 'Add CF Record' : 'Edit CF Record'}</h3>
-                        <button onClick={() => { setEditingRecord(null); setIsAdding(false); setError(null); }} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><X size={24} /></button>
+                        <button onClick={() => { setEditingRecord(null); setIsAdding(false); setLocalError(null); }} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><X size={24} /></button>
                     </div>
 
-                    {error && (
+                    {localError && (
                         <div style={{ padding: '12px', background: 'var(--md-sys-color-error-container)', color: 'var(--md-sys-color-on-error-container)', borderRadius: '12px', marginBottom: '20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <AlertCircle size={16} /> {error}
+                            <AlertCircle size={16} /> {localError}
                         </div>
                     )}
 
@@ -235,7 +244,7 @@ export default function CloudflareView() {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {(dnsData?.records || []).map((record: any) => (
+                        {(dnsData?.records || []).map((record: CFRecord) => (
                             <div key={record.id} style={{ padding: '20px', background: 'var(--md-sys-color-surface-container-high)', borderRadius: '24px', border: '1px solid var(--md-sys-color-outline-variant)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px', minWidth: 0 }}>
                                     <div style={{ 
@@ -267,7 +276,7 @@ export default function CloudflareView() {
                                         <Pencil size={18} />
                                     </button>
                                     <button 
-                                        onClick={() => handleDeleteRecord(record.id)}
+                                        onClick={() => { if (record.id) handleDeleteRecord(record.id); }}
                                         className="m3-press-effect"
                                         style={{ background: 'none', border: 'none', color: 'var(--md-sys-color-error)', opacity: 0.5, cursor: 'pointer' }}
                                     >
@@ -311,12 +320,12 @@ export default function CloudflareView() {
                             <p style={{ fontSize: '13px', opacity: 0.5, margin: 0 }}>Active network zones and edge configuration</p>
                         </div>
                         <span style={{ padding: '6px 16px', background: 'var(--md-sys-color-primary-container)', color: 'var(--md-sys-color-on-primary-container)', borderRadius: '24px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
-                            {data.domains?.length || 0} Zones Managed
+                            {data?.domains?.length || 0} Zones Managed
                         </span>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {(data.domains || []).map((domain: any) => (
+                        {(data?.domains || []).map((domain: CFDomain) => (
                             <button 
                                 key={domain.id} 
                                 onClick={() => setSelectedZone(domain)}

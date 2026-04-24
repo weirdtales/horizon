@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import { 
-    Globe, Fingerprint, ShieldCheck, RefreshCw, Loader2, 
-    Server, Activity, Shield, ArrowLeft, ChevronRight, Search, 
-    ExternalLink, AlertCircle, ChevronLeft, Layers, Settings, HardDrive,
-    Trash2, Plus, Info, Pencil, Check, X, Save
+    Globe, ShieldCheck, Loader2, 
+    ChevronRight, AlertCircle, ChevronLeft, Layers,
+    Trash2, Plus, Info, Pencil, X, Save
 } from 'lucide-react';
-import { BackButton } from '@/app/components/BackButton';
 import { useService } from '@/app/hooks/useService';
 import { useMobile } from '@/app/hooks/useMobile';
 
@@ -19,6 +17,10 @@ interface DNSRecord {
     priority?: number;
 }
 
+interface LoopiaDomain {
+    domain: string;
+}
+
 export default function LoopiaView() {
     const isMobile = useMobile(1024);
     const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
@@ -28,16 +30,16 @@ export default function LoopiaView() {
     const [editingRecord, setEditingRecord] = useState<DNSRecord | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [localError, setLocalError] = useState<string | null>(null);
 
-    const { data: domainsData, loading: domainsLoading, error: domainsError, refetch: refetchDomains } = useService('loopia/domains', 300000);
+    const { data: domainsData, loading: domainsLoading } = useService('loopia/domains', 300000);
     
-    const { data: subsData, loading: subsLoading, error: subsError } = useService(
+    const { data: subsData, loading: subsLoading } = useService(
         selectedDomain ? `loopia/subdomains?domain=${selectedDomain}` : 'loopia/domains',
         selectedDomain ? 300000 : 9999999
     );
 
-    const { data: recordsData, loading: recordsLoading, error: recordsError, refetch: refetchRecords } = useService(
+    const { data: recordsData, loading: recordsLoading, refetch: refetchRecords } = useService(
         (selectedDomain && selectedSubdomain) ? `loopia/records?domain=${selectedDomain}&subdomain=${selectedSubdomain}` : 'loopia/domains',
         (selectedDomain && selectedSubdomain) ? 300000 : 9999999
     );
@@ -45,7 +47,7 @@ export default function LoopiaView() {
     const handleSaveRecord = async (record: DNSRecord) => {
         if (!selectedDomain || !selectedSubdomain) return;
         setSaving(true);
-        setError(null);
+        setLocalError(null);
         try {
             const method = record.record_id ? 'PUT' : 'POST';
             const res = await fetch('/api/loopia/records', {
@@ -63,8 +65,8 @@ export default function LoopiaView() {
             await refetchRecords();
             setEditingRecord(null);
             setIsAdding(false);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setLocalError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }
@@ -75,7 +77,7 @@ export default function LoopiaView() {
         if (!confirm('Are you sure you want to delete this DNS record?')) return;
         
         setSaving(true);
-        setError(null);
+        setLocalError(null);
         try {
             const res = await fetch('/api/loopia/records', {
                 method: 'DELETE',
@@ -90,8 +92,8 @@ export default function LoopiaView() {
             if (!res.ok) throw new Error(data.error || 'Failed to delete record');
             
             await refetchRecords();
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setSaving(false);
         }
@@ -114,12 +116,12 @@ export default function LoopiaView() {
                 <div className="md3-card-elevated" style={{ width: '100%', maxWidth: '400px', background: 'var(--md-sys-color-surface-container-high)', borderRadius: '32px', padding: '32px', boxShadow: 'var(--md-sys-elevation-5)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                         <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{isAdding ? 'Add DNS Record' : 'Edit DNS Record'}</h3>
-                        <button onClick={() => { setEditingRecord(null); setIsAdding(false); setError(null); }} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><X size={24} /></button>
+                        <button onClick={() => { setEditingRecord(null); setIsAdding(false); setLocalError(null); }} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><X size={24} /></button>
                     </div>
 
-                    {error && (
+                    {localError && (
                         <div style={{ padding: '12px', background: 'var(--md-sys-color-error-container)', color: 'var(--md-sys-color-on-error-container)', borderRadius: '12px', marginBottom: '20px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <AlertCircle size={16} /> {error}
+                            <AlertCircle size={16} /> {localError}
                         </div>
                     )}
 
@@ -217,7 +219,7 @@ export default function LoopiaView() {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {(recordsData?.records || []).map((record: any) => (
+                        {(recordsData?.records || []).map((record: DNSRecord) => (
                             <div key={record.record_id} style={{ padding: '20px', background: 'var(--md-sys-color-surface-container-high)', borderRadius: '24px', border: '1px solid var(--md-sys-color-outline-variant)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                                     <div style={{ backgroundColor: 'var(--md-sys-color-secondary-container)', color: 'var(--md-sys-color-on-secondary-container)', padding: '10px', borderRadius: '12px', fontSize: '11px', fontWeight: 900, width: '40px', textAlign: 'center' }}>
@@ -237,7 +239,7 @@ export default function LoopiaView() {
                                         <Pencil size={18} />
                                     </button>
                                     <button 
-                                        onClick={() => handleDeleteRecord(record.record_id)}
+                                        onClick={() => { if (record.record_id) handleDeleteRecord(record.record_id); }}
                                         className="m3-press-effect"
                                         style={{ background: 'none', border: 'none', color: 'var(--md-sys-color-error)', cursor: 'pointer', padding: '8px' }}
                                     >
@@ -335,7 +337,7 @@ export default function LoopiaView() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-                    {(domainsData?.domains || []).map((domain: any, idx: number) => (
+                    {(domainsData?.domains || []).map((domain: LoopiaDomain, idx: number) => (
                         <button 
                             key={`${domain.domain}-${idx}`} 
                             onClick={() => setSelectedDomain(domain.domain)}

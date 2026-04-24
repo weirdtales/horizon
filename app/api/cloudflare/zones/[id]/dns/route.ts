@@ -90,8 +90,8 @@ export async function GET(
             }))
         });
 
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     } finally {
         if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
     }
@@ -116,8 +116,8 @@ export async function POST(
         const data = await res.json();
         if (!res.ok) return NextResponse.json(data, { status: res.status });
         return NextResponse.json(data);
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     }
 }
 
@@ -140,8 +140,8 @@ export async function PATCH(
         const data = await res.json();
         if (!res.ok) return NextResponse.json(data, { status: res.status });
         return NextResponse.json(data);
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     }
 }
 
@@ -163,7 +163,7 @@ export async function DELETE(
         const data = await res.json();
         if (!res.ok) return NextResponse.json(data, { status: res.status });
         return NextResponse.json(data);
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     }
 }

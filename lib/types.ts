@@ -16,7 +16,7 @@ export interface Bookmark {
     size?: 'square' | 'wide';
 }
 
-export type DashboardLayoutItem = string | { i: string; x: number; y: number; w: number; h: number; [key: string]: any };
+export type DashboardLayoutItem = string | { i: string; x: number; y: number; w: number; h: number; [key: string]: unknown };
 
 export interface DashboardSection {
     id: string;
@@ -69,7 +69,7 @@ export type AppSettings = {
     bookmarks: Bookmark[];
     modules?: Record<string, { enabled: boolean }>;
     workspace?: { clientId?: string; clientSecret?: string; accessToken?: string; refreshToken?: string; expiryDate?: number };
-    [key: string]: any;
+    [key: string]: unknown;
 };
 
 export interface ModuleField {

@@ -1,6 +1,28 @@
 import { NextResponse } from 'next/server';
 import { getSettings } from '@/lib/settings';
 
+interface RadarrMovie {
+    id: number;
+    title: string;
+    hasFile: boolean;
+    monitored: boolean;
+    sizeOnDisk?: number;
+    added?: string;
+    year: number;
+    images?: { coverType: string; remoteUrl: string }[];
+}
+
+interface RadarrQueueItem {
+    id: number;
+    title: string;
+    size: number;
+    sizeleft: number;
+    status: string;
+    trackedDownloadStatus: string;
+    timeleft?: string;
+    estimatedCompletionTime?: string;
+}
+
 export async function GET() {
     const settings = await getSettings();
     const config = settings.radarr;
@@ -24,10 +46,10 @@ export async function GET() {
             signal: controller.signal
         });
         if (!moviesRes.ok) throw new Error(`Radarr Movies API error: ${moviesRes.status}`);
-        const movies = await moviesRes.json();
+        const movies: RadarrMovie[] = await moviesRes.json();
 
         // 2. Fetch Queue (Active Downloads)
-        let queue = [];
+        let queue: RadarrQueueItem[] = [];
         try {
             const queueRes = await fetch(`${baseUrl}/api/v3/queue?includeUnknownMovieMovieItems=true`, { 
                 headers, 
@@ -43,19 +65,18 @@ export async function GET() {
             }
         } catch (queueErr) {
             console.error('Failed to fetch Radarr queue:', queueErr);
-            // Non-blocking: continue with empty queue if only queue fails
         }
         
         clearTimeout(timeoutId);
 
         // 3. Process Stats
         const totalMovies = movies.length;
-        const downloadedMovies = movies.filter((m: any) => m.hasFile).length;
-        const missingMovies = movies.filter((m: any) => !m.hasFile && m.monitored).length;
-        const totalSize = movies.reduce((acc: number, m: any) => acc + (m.sizeOnDisk || 0), 0);
+        const downloadedMovies = movies.filter(m => m.hasFile).length;
+        const missingMovies = movies.filter(m => !m.hasFile && m.monitored).length;
+        const totalSize = movies.reduce((acc, m) => acc + (m.sizeOnDisk || 0), 0);
 
         // 4. Process Active Downloads
-        const activeDownloads = queue.map((item: any) => ({
+        const activeDownloads = queue.map(item => ({
             id: item.id,
             title: item.title,
             size: item.size || 0,
@@ -80,31 +101,30 @@ export async function GET() {
                 totalSize
             },
             queue: activeDownloads,
-            // Return a few recent movies for the widget
             recent: movies
-                .filter((m: any) => m.hasFile)
-                .sort((a: any, b: any) => {
+                .filter(m => m.hasFile)
+                .sort((a, b) => {
                     const timeA = new Date(a.added || 0).getTime() || 0;
                     const timeB = new Date(b.added || 0).getTime() || 0;
                     return timeB - timeA;
                 })
                 .slice(0, 30)
-                .map((m: any) => ({
+                .map(m => ({
                     id: m.id,
                     title: m.title,
                     year: m.year,
                     poster: Array.isArray(m.images)
-                        ? (m.images.find((img: any) => img.coverType === 'poster')?.remoteUrl || m.images[0]?.remoteUrl)
+                        ? (m.images.find(img => img.coverType === 'poster')?.remoteUrl || m.images[0]?.remoteUrl)
                         : null
                 }))
         });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Radarr API Error:', err);
         return NextResponse.json({ 
             status: 'offline',
             error: 'Failed to connect to Radarr',
-            details: err.message
+            details: err instanceof Error ? err.message : String(err)
         }, { status: 502 });
     } finally {
         if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);

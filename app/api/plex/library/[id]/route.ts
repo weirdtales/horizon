@@ -1,6 +1,28 @@
 import { NextResponse } from 'next/server';
 import { getPlexConnection, cachedPlexFetch } from '@/lib/plex';
 
+interface PlexLibraryItem {
+    ratingKey: string;
+    title: string;
+    year?: number;
+    type: string;
+    summary?: string;
+    contentRating?: string;
+    studio?: string;
+    Genre?: { tag: string }[];
+    thumb?: string;
+    art?: string;
+    addedAt: number;
+}
+
+interface PlexLibraryResponse {
+    MediaContainer: {
+        title1?: string;
+        totalSize?: string;
+        Metadata?: PlexLibraryItem[];
+    };
+}
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -19,12 +41,13 @@ export async function GET(
         const { url, headers } = await getPlexConnection();
 
         // Fetch section contents with caching (100 recent items)
-        const data = await cachedPlexFetch(
+        const dataRaw = await cachedPlexFetch(
             `${url}/library/sections/${sanitizedId}/all?X-Plex-Container-Start=0&X-Plex-Container-Size=100`, 
             headers
         );
+        const data = dataRaw as unknown as PlexLibraryResponse;
 
-        const items = data.MediaContainer?.Metadata?.map((m: any) => ({
+        const items = data.MediaContainer?.Metadata?.map((m: PlexLibraryItem) => ({
             id: m.ratingKey,
             title: m.title,
             year: m.year,
@@ -32,7 +55,7 @@ export async function GET(
             summary: m.summary,
             rating: m.contentRating,
             studio: m.studio,
-            genres: m.Genre?.map((g: any) => g.tag) || [],
+            genres: m.Genre?.map(g => g.tag) || [],
             thumb: m.thumb ? `/api/plex/image?path=${encodeURIComponent(m.thumb)}` : null,
             art: m.art ? `/api/plex/image?path=${encodeURIComponent(m.art)}` : null,
             addedAt: m.addedAt
@@ -44,7 +67,7 @@ export async function GET(
             items
         });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Plex Library Fetch Error:', err);
         return NextResponse.json({ 
             error: 'Failed to fetch library content'
