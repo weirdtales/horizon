@@ -13,7 +13,6 @@ export async function POST(request: Request) {
         await callLoopia('addSubdomain', [domain, newSubdomain]);
 
         // 2. Fetch all records from the old subdomain
-        // @ts-expect-error - callLoopia returns unknown, but we know it's a LoopiaRecord array here
         const records = (await callLoopia('getZoneRecords', [domain, oldSubdomain])) as LoopiaRecord[];
 
         // 3. Add those records to the new subdomain
