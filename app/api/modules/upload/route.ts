@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
             if (fs.existsSync(zipPath)) await unlink(zipPath);
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Upload Error]:', error);
         
         // Strict allowlist for error messages to prevent leaking internal state
@@ -141,8 +141,9 @@ export async function POST(req: NextRequest) {
             'Invalid Module ID: path traversal detected.'
         ];
 
-        const safeMessage = SAFE_ERRORS.includes(error.message) 
-            ? error.message 
+        const errorMessage = error instanceof Error ? error.message : '';
+        const safeMessage = SAFE_ERRORS.includes(errorMessage) 
+            ? errorMessage 
             : 'Internal server error during upload.';
             
         return NextResponse.json({ error: safeMessage }, { status: 500 });

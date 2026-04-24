@@ -56,8 +56,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         // Attempt removal directly to avoid TOCTOU (Time-of-Check Time-of-Use) vulnerabilities
         try {
             await fs.promises.rm(modulePath, { recursive: true, force: false });
-        } catch (rmErr: any) {
-            if (rmErr.code === 'ENOENT') {
+        } catch (rmErr: unknown) {
+            if ((rmErr as { code?: string }).code === 'ENOENT') {
                 return NextResponse.json({ error: 'Module not found' }, { status: 404 });
             }
             throw rmErr; // Rethrow other errors to be caught by the outer catch
@@ -76,7 +76,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         }
 
         return NextResponse.json({ success: true, message: `Module ${id} deleted successfully` });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('[Module Deletion Error]:', error);
         // 5. Generic error message to prevent internal leak
         return NextResponse.json({ error: 'Internal server error during deletion' }, { status: 500 });

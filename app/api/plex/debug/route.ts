@@ -18,14 +18,14 @@ export async function GET() {
 
     try {
         const discRes = await fetch('https://plex.tv/api/v2/resources?includeHttps=1', { headers });
-        const data = await discRes.json();
+        const data = await discRes.json() as PlexResourceItem[];
         
         const servers = data
-            .filter((item: any) => item.provides && item.provides.includes('server'))
-            .map((s: any) => ({
+            .filter((item) => item.provides && item.provides.includes('server'))
+            .map((s) => ({
                 name: s.name,
                 machineId: s.clientIdentifier,
-                connections: s.connections.map((c: any) => ({
+                connections: s.connections.map((c) => ({
                     uri: c.uri,
                     address: c.address,
                     local: c.local,
@@ -34,7 +34,19 @@ export async function GET() {
             }));
 
         return NextResponse.json({ servers });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: err instanceof Error ? err.message : 'Unknown error' }, { status: 500 });
     }
+}
+
+interface PlexResourceItem {
+    provides: string;
+    name: string;
+    clientIdentifier: string;
+    connections: {
+        uri: string;
+        address: string;
+        local: boolean;
+        relay?: boolean;
+    }[];
 }
