@@ -1,0 +1,29 @@
+{
+    "id": "adguard",
+    "name": "AdGuard Home",
+    "icon": "Shield",
+    "color": "#4ade80",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.5"
+        },
+        {
+            "key": "user",
+            "label": "Username",
+            "type": "text",
+            "placeholder": "admin"
+        },
+        {
+            "key": "password",
+            "label": "Password",
+            "type": "password",
+            "placeholder": "••••••••"
+        }
+    ]
+}

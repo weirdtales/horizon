@@ -1,0 +1,23 @@
+{
+    "id": "immich",
+    "name": "Immich",
+    "icon": "Camera",
+    "color": "#4ade80",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:2283"
+        },
+        {
+            "key": "apiKey",
+            "label": "API Key",
+            "type": "password",
+            "placeholder": "API Key from user settings"
+        }
+    ]
+}

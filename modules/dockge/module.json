@@ -1,0 +1,29 @@
+{
+    "id": "dockge",
+    "name": "Dockge",
+    "icon": "Layers",
+    "color": "#3c9bdc",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:5001"
+        },
+        {
+            "key": "user",
+            "label": "Username",
+            "type": "text",
+            "placeholder": "admin"
+        },
+        {
+            "key": "password",
+            "label": "Password",
+            "type": "password",
+            "placeholder": "••••••••"
+        }
+    ]
+}

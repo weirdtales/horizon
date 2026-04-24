@@ -1,0 +1,22 @@
+{
+    "id": "weather",
+    "name": "Weather & Clock",
+    "icon": "CloudRain",
+    "color": "#a8c7fa",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        { "key": "location", "label": "Display Location", "type": "text", "placeholder": "e.g. Stockholm" },
+        { 
+            "key": "units", 
+            "label": "Temperature Units", 
+            "type": "select", 
+            "options": [
+                { "value": "metric", "label": "Metric (°C)" },
+                { "value": "imperial", "label": "Imperial (°F)" }
+            ]
+        },
+        { "key": "apiKey", "label": "API Key (Optional)", "type": "password", "placeholder": "OpenWeatherMap API Key" }
+    ]
+}

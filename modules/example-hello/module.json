@@ -1,0 +1,20 @@
+{
+    "id": "example-hello",
+    "name": "Example Hello",
+    "description": "A template module to demonstrate how to build new extensions.",
+    "icon": "Zap",
+    "color": "#818cf8",
+    "version": "1.0.0",
+    "author": "Horizon Team",
+    "hasWidget": true,
+    "hasView": true,
+    "hidden": true, 
+    "configFields": [
+        {
+            "key": "greeting",
+            "label": "Greeting Message",
+            "type": "text",
+            "placeholder": "Hello, Horizon!"
+        }
+    ]
+}
