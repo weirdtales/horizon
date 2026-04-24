@@ -12,7 +12,7 @@ import {
 import { sanitizeUrl } from '../lib/url';
 import { DashboardRow, DashboardSection, AppSettings, Bookmark, DashboardLayoutItem } from '../lib/types';
 
-import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
+import { Responsive, WidthProvider, Layout } from 'react-grid-layout/legacy';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 import 'react-grid-layout/css/styles.css';
 
@@ -655,7 +655,14 @@ export default function DashboardHub() {
                                     >
                                         <ResponsiveGridLayout
                                             className="layout"
-                                            layouts={{ lg: section.layout as unknown as unknown[], md: section.layout as unknown as unknown[], sm: section.layout as unknown as unknown[] }}
+                                            layouts={{ 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                lg: section.layout as any, 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                md: section.layout as any, 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                sm: section.layout as any 
+                                            }}
                                             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                                             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
                                             rowHeight={120}

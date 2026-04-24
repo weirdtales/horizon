@@ -164,7 +164,44 @@ export default function SettingsPage() {
     const [plexAuth, setPlexAuth] = useState<{ id: string, code: string, expires_at: string } | null>(null);
     const [plexAuthStatus, setPlexAuthStatus] = useState<'idle' | 'linking' | 'success' | 'error' | 'discovery'>('idle');
     const [plexPolling, setPlexPolling] = useState(false);
+    const [currentTheme, setCurrentTheme] = useState('dark');
     const [discoveredServers, setDiscoveredServers] = useState<Array<{ id: string; name: string; url: string; machineId: string; token: string }>>([]);
+
+    const handleSave = React.useCallback(async (explicitSettings?: AppSettings) => {
+        // Defensive check: if the first argument is a React Event, ignore it
+        const settingsToSave = (explicitSettings && !(explicitSettings as unknown as { nativeEvent?: unknown }).nativeEvent) ? explicitSettings : settings;
+        
+        if (!settingsToSave) {
+            setToast({ message: 'Engine still initializing. Please wait.', type: 'error' });
+            return;
+        }
+
+        setSaving(true);
+        setToast({ message: 'Syncing settings...', type: 'loading' });
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: settingsToSave })
+            });
+            if (res.ok) {
+                setToast({ message: 'Settings saved successfully!', type: 'success' });
+                setInitialSettings(JSON.parse(JSON.stringify(settingsToSave)));
+                
+                // Dispatch event for other components to sync instantly
+                window.dispatchEvent(new CustomEvent('dashboard-settings-updated'));
+            } else {
+                throw new Error('Server returned an error');
+            }
+        } catch (err) {
+            console.error('Save Error:', err);
+            setToast({ message: `Failed to save: ${err instanceof Error ? err.message : 'Unknown Error'}`, type: 'error' });
+            return false;
+        } finally {
+            setSaving(false);
+        }
+        return true;
+    }, [settings]);
 
     useEffect(() => {
         let pollInterval: NodeJS.Timeout;
@@ -229,7 +266,7 @@ export default function SettingsPage() {
                         setTimeout(() => setPlexAuth(null), 3000);
                     }
                 } catch {
-                    console.error('Plex Poll Error:', err);
+                    console.error('Plex Poll Error');
                 }
             }, 3000);
         }
@@ -445,41 +482,6 @@ export default function SettingsPage() {
         });
     };
 
-    const handleSave = React.useCallback(async (explicitSettings?: AppSettings) => {
-        // Defensive check: if the first argument is a React Event, ignore it
-        const settingsToSave = (explicitSettings && !(explicitSettings as unknown as { nativeEvent?: unknown }).nativeEvent) ? explicitSettings : settings;
-        
-        if (!settingsToSave) {
-            setToast({ message: 'Engine still initializing. Please wait.', type: 'error' });
-            return;
-        }
-
-        setSaving(true);
-        setToast({ message: 'Syncing settings...', type: 'loading' });
-        try {
-            const res = await fetch('/api/settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ settings: settingsToSave })
-            });
-            if (res.ok) {
-                setToast({ message: 'Settings saved successfully!', type: 'success' });
-                setInitialSettings(JSON.parse(JSON.stringify(settingsToSave)));
-                
-                // Dispatch event for other components to sync instantly
-                window.dispatchEvent(new CustomEvent('dashboard-settings-updated'));
-            } else {
-                throw new Error('Server returned an error');
-            }
-        } catch (err) {
-            console.error('Save Error:', err);
-            setToast({ message: `Failed to save: ${err instanceof Error ? err.message : 'Unknown Error'}`, type: 'error' });
-            return false;
-        } finally {
-            setSaving(false);
-        }
-        return true;
-    }, [settings]);
 
     const removeBookmark = (id: string) => {
         setSettings((prev) => {
@@ -1741,7 +1743,7 @@ export default function SettingsPage() {
         {editingPlugin && (
             <ModuleSettingsDialog 
                 module={editingPlugin}
-                initialSettings={settings[editingPlugin.id] || {}}
+                initialSettings={(settings[editingPlugin.id] as Record<string, unknown>) || {}}
                 onSave={async (newSet) => {
                     if (!settings) return;
                     const next = {

@@ -142,7 +142,7 @@ export function ModuleSettingsDialog({ module, initialSettings, onSave, onClose,
                                 {field.type === 'select' ? (
                                     <select
                                         id={fieldId}
-                                        value={settings[field.key] || ''}
+                                        value={(settings[field.key] as string | number | undefined) || ''}
                                         onChange={e => setSettings({ ...settings, [field.key]: e.target.value })}
                                         style={{
                                             backgroundColor: 'var(--md-sys-color-surface-container-highest)',
@@ -165,7 +165,7 @@ export function ModuleSettingsDialog({ module, initialSettings, onSave, onClose,
                                     <input
                                         id={fieldId}
                                         type={field.type === 'password' ? 'password' : 'text'}
-                                        value={settings[field.key] || ''}
+                                        value={(settings[field.key] as string | number | undefined) || ''}
                                         onChange={e => setSettings({ ...settings, [field.key]: e.target.value })}
                                         placeholder={field.placeholder}
                                         style={{
