@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { 
     PlaySquare, Database, Loader2, Monitor, 
     Activity, RefreshCw, Film, Video, Music, 
@@ -169,13 +170,25 @@ export default function PlexView() {
                                 }}>
                                     {session.art && (
                                         <div style={{ position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none' }}>
-                                            <img src={sanitizeUrl(session.art)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(10px)' }} /> {/* snyk-ignore: javascript/DOMXSS */}
+                                            <Image 
+                                                src={sanitizeUrl(session.art)} 
+                                                alt="" 
+                                                fill
+                                                style={{ objectFit: 'cover', filter: 'blur(10px)' }}
+                                                unoptimized
+                                            />
                                             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, var(--md-sys-color-surface-container-low), transparent, var(--md-sys-color-surface-container-low))' }} />
                                         </div>
                                     )}
                                     <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: '20px', alignItems: 'center' }}>
-                                        <div style={{ width: '80px', height: '120px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--md-sys-elevation-2)' }}>
-                                            <img src={sanitizeUrl(session.thumb || '')} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> {/* snyk-ignore: javascript/DOMXSS */}
+                                        <div style={{ width: '80px', height: '120px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--md-sys-elevation-2)', position: 'relative' }}>
+                                            <Image 
+                                                src={sanitizeUrl(session.thumb || '')} 
+                                                alt="" 
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                                unoptimized
+                                            />
                                         </div>
                                         <div>
                                             <div style={{ fontSize: '11px', fontWeight: 900, color: '#eab308', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>{session.user} is watching</div>

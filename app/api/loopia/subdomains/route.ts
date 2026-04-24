@@ -9,8 +9,9 @@ export async function GET(request: Request) {
     try {
         const subdomains = await callLoopia('getSubdomains', [domain]);
         return NextResponse.json({ subdomains });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -21,8 +22,9 @@ export async function POST(request: Request) {
 
         await callLoopia('addSubdomain', [domain, subdomain]);
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -33,7 +35,8 @@ export async function DELETE(request: Request) {
 
         await callLoopia('removeSubdomain', [domain, subdomain]);
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

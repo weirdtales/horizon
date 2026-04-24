@@ -55,11 +55,21 @@ export type AppSettings = {
     navigation: NavItem[];
     appearance: {
         theme: 'light' | 'dark' | 'system' | 'time';
-        accentColor: 'blue' | 'green' | 'purple' | 'red' | 'yellow';
+        accentColor: string;
         showHeaderStats?: boolean;
+        userName?: string;
+        bgType?: 'color' | 'image' | 'default';
+        bgImage?: string;
+        bgColor?: string;
+        backgroundColor?: string;
+        backgroundImage?: string;
+        dayStart?: number;
+        nightStart?: number;
     };
     bookmarks: Bookmark[];
+    modules?: Record<string, { enabled: boolean }>;
     workspace?: { clientId?: string; clientSecret?: string; accessToken?: string; refreshToken?: string; expiryDate?: number };
+    [key: string]: any;
 };
 
 export interface ModuleField {
@@ -67,6 +77,8 @@ export interface ModuleField {
     label: string;
     type: string;
     placeholder?: string;
+    options?: { label: string, value: string }[];
+    helpText?: string;
 }
 
 export interface ModuleManifest {

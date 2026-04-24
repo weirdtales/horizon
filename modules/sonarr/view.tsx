@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
     Video, Download, Database, 
     Loader2, AlertCircle, RefreshCw, Clock
@@ -173,15 +174,12 @@ export default function SonarrView() {
                             padding: 0
                         }}>
                              <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                                <img 
+                                <Image 
                                     src={sanitizeUrl(series.poster)}
                                     alt={series.title} 
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    onError={(e: any) => { 
-                                        if (e.target.dataset.fallback) return;
-                                        e.target.dataset.fallback = 'true';
-                                        e.target.src = 'https://via.placeholder.com/300x450?text=No+Poster'; 
-                                    }}
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                    unoptimized
                                 />
                                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)' }} />
                                 <div style={{ position: 'absolute', bottom: '10px', left: '10px', right: '10px' }}>

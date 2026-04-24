@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PlaySquare, Loader2, Film, Video, Activity } from 'lucide-react';
+import Image from 'next/image';
 import { useService } from '@/app/hooks/useService';
 import { sanitizeUrl, sanitizeText } from '@/lib/url';
 
@@ -72,8 +73,14 @@ export default function PlexWidget() {
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '4px' }}>
                   {activeSession ? (
                         <div style={{ width: '100%', background: 'var(--md-sys-color-surface-container-highest)', backdropFilter: 'blur(20px)', borderRadius: '24px', padding: '14px', border: '1px solid var(--md-sys-color-outline-variant)', display: 'flex', gap: '16px', alignItems: 'center', animation: 'fadeIn 0.6s var(--md-sys-motion-easing-emphasized)', transition: 'background-color 0.3s ease' }}>
-                              <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 8px 24px rgba(0,0,0,0.2)', border: '1px solid var(--md-sys-color-outline-variant)' }}>
-                                <img src={sanitizeUrl(activeSession.thumb, '')} alt={activeSession.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 8px 24px rgba(0,0,0,0.2)', border: '1px solid var(--md-sys-color-outline-variant)', position: 'relative' }}>
+                                <Image 
+                                    src={sanitizeUrl(activeSession.thumb, '')} 
+                                    alt={activeSession.title} 
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                    unoptimized
+                                />
                             </div>
                             <div style={{ minWidth: 0, flex: 1 }}>
                                 <div style={{ fontSize: '9px', fontWeight: 900, color: '#eab308', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>LIVE STREAMING</div>

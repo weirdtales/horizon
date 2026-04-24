@@ -10,8 +10,9 @@ export async function GET(request: Request) {
     try {
         const records = await callLoopia('getZoneRecords', [domain, subdomain]);
         return NextResponse.json({ records });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -20,8 +21,9 @@ export async function POST(request: Request) {
         const { domain, subdomain, record } = await request.json();
         await callLoopia('addZoneRecord', [domain, subdomain, record]);
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -30,8 +32,9 @@ export async function PUT(request: Request) {
         const { domain, subdomain, record } = await request.json();
         await callLoopia('updateZoneRecord', [domain, subdomain, record]);
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -44,7 +47,8 @@ export async function DELETE(request: Request) {
 
         await callLoopia('removeZoneRecord', [domain, subdomain, parseInt(record_id, 10)]);
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

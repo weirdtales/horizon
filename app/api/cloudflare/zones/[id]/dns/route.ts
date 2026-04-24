@@ -65,7 +65,18 @@ export async function GET(
                 name_servers: zone.name_servers,
                 development_mode: zone.development_mode > 0
             } : null,
-            records: records.map((r: any) => ({
+            records: records.map((r: {
+                id: string;
+                type: string;
+                name: string;
+                content: string;
+                proxiable: boolean;
+                proxied: boolean;
+                ttl: number;
+                locked: boolean;
+                created_on: string;
+                modified_on: string;
+            }) => ({
                 id: r.id,
                 type: r.type,
                 name: r.name,
@@ -79,7 +90,80 @@ export async function GET(
             }))
         });
 
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
     } finally {
         if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+    }
+}
+
+export async function POST(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id: zoneId } = await params;
+    const settings = await getSettings();
+    const cf = settings.cloudflare;
+    if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
+
+    try {
+        const body = await request.json();
+        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) return NextResponse.json(data, { status: res.status });
+        return NextResponse.json(data);
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
+export async function PATCH(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id: zoneId } = await params;
+    const settings = await getSettings();
+    const cf = settings.cloudflare;
+    if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
+
+    try {
+        const { record_id, ...record } = await request.json();
+        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${record_id}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(record)
+        });
+        const data = await res.json();
+        if (!res.ok) return NextResponse.json(data, { status: res.status });
+        return NextResponse.json(data);
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id: zoneId } = await params;
+    const settings = await getSettings();
+    const cf = settings.cloudflare;
+    if (!cf || !cf.token) return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 400 });
+
+    try {
+        const { record_id } = await request.json();
+        const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${record_id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${cf.token}`, 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (!res.ok) return NextResponse.json(data, { status: res.status });
+        return NextResponse.json(data);
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

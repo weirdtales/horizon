@@ -12,7 +12,7 @@ export async function POST(request: Request) {
         await callLoopia('addSubdomain', [domain, newSubdomain]);
 
         // 2. Fetch all records from the old subdomain
-        const records = await callLoopia('getZoneRecords', [domain, oldSubdomain]);
+        const records = (await callLoopia('getZoneRecords', [domain, oldSubdomain])) as any[];
 
         // 3. Add those records to the new subdomain
         for (const rec of records) {
@@ -28,7 +28,8 @@ export async function POST(request: Request) {
         await callLoopia('removeSubdomain', [domain, oldSubdomain]);
 
         return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

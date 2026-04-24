@@ -4,7 +4,7 @@ import { getPlexConnection, cachedPlexFetch } from '@/lib/plex';
 export async function GET() {
     try {
         // Use shared logic for discovery and healing
-        const { url, token, headers, identity, healed } = await getPlexConnection();
+        const { url, headers, identity, healed } = await getPlexConnection();
 
         // Fetch Data using cached helper (60s TTL)
         const [sessionsData, libraryData] = await Promise.all([

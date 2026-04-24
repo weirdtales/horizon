@@ -1,26 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { X, Save, Database, Info, Loader2, AlertCircle } from 'lucide-react';
+import { X, Save, Info, Loader2, AlertCircle } from 'lucide-react';
 import { DashboardIcon } from './DashboardIcon';
-
-interface Field {
-    key: string;
-    label: string;
-    type: string;
-    placeholder?: string;
-    options?: { label: string, value: string }[];
-    helpText?: string;
-}
+import { ModuleManifest, ModuleField as Field } from '@/lib/types';
 
 interface ModuleSettingsDialogProps {
-    module: {
-        id: string;
-        name: string;
-        icon: string;
-        color: string;
-        configFields: Field[];
-    };
+    module: ModuleManifest;
     initialSettings: any;
     onSave: (newSettings: any) => Promise<void>;
     onClose: () => void;
@@ -143,7 +129,7 @@ export function ModuleSettingsDialog({ module, initialSettings, onSave, onClose,
                             {error}
                         </div>
                     )}
-                    {module.configFields.map(field => {
+                    {(module.configFields || []).map(field => {
                         const fieldId = `module-setting-${module.id}-${field.key}`;
                         return (
                             <div key={field.key} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

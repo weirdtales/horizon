@@ -27,7 +27,7 @@ export async function GET() {
         const safeSettings = JSON.parse(JSON.stringify(settings));
 
         // Mask secrets
-        for (const [_, moduleData] of Object.entries(safeSettings)) {
+        for (const moduleData of Object.values(safeSettings)) {
             if (!moduleData || Array.isArray(moduleData) || typeof moduleData !== 'object') continue;
 
             for (const [credential, val] of Object.entries(moduleData)) {
@@ -86,18 +86,18 @@ export async function POST(request: Request) {
 
                 // Safety: If target is an array but update is an object (not array), skip or handle
                 // to prevent data corruption.
-                if (Array.isArray((current as Record<string, Record<string, unknown>>)[moduleKey][field]) && val !== null && typeof val === 'object' && !Array.isArray(val)) {
+                if (Array.isArray((current as any)[moduleKey][field]) && val !== null && typeof val === 'object' && !Array.isArray(val)) {
                     console.warn(`[Settings API]: Attempted to merge object onto array for ${moduleKey}.${field}. Skipping.`);
                     continue;
                 }
 
                 // Arrays are overwritten, not merged deep - Sanitize array content
                 if (Array.isArray(val)) {
-                    (current as Record<string, Record<string, unknown>>)[moduleKey][field] = sanitizeObject(val);
+                    (current as any)[moduleKey][field] = sanitizeObject(val);
                 } 
                 // Only update if it's not the masked string
                 else if (val !== '********') {
-                    (current as Record<string, Record<string, unknown>>)[moduleKey][field] = sanitizeObject(val);
+                    (current as any)[moduleKey][field] = sanitizeObject(val);
                 }
             }
         }

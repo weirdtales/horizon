@@ -16,7 +16,7 @@ import {
 
 
 
-import { NavItem, AppSettings, ModuleManifest, Bookmark } from '@/lib/types';
+import { NavItem, AppSettings, ModuleManifest, Bookmark, DashboardRow, DashboardSection, DashboardLayoutItem } from '@/lib/types';
 import { BackButton } from '../components/BackButton';
 import { DashboardIcon, COMMON_ICONS } from '../components/DashboardIcon';
 import { MD3Toast, ToastType } from '../components/MD3Toast';
@@ -138,6 +138,7 @@ export default function SettingsPage() {
     };
 
     const toggleModule = async (id: string, enabled: boolean) => {
+        if (!settings) return;
         const next = {
             ...settings,
             modules: {
@@ -208,7 +209,7 @@ export default function SettingsPage() {
                                             url: srv.url,
                                             serverName: srv.name,
                                             machineId: srv.machineId,
-                                            authMethod: 'plex_login'
+                                            authMethod: 'plex_login' as const
                                         }
                                     };
                                     handleSave(next);
@@ -423,11 +424,11 @@ export default function SettingsPage() {
             
             if (isEditing) {
                 newNav = prev.navigation.map((item: NavItem) => 
-                    item.id === newItem.id ? { ...item, ...newItem } : item
+                    item.id === newItem.id ? { ...item, ...newItem } as NavItem : item
                 );
             } else {
                 const id = (newItem.label || '').toLowerCase().replace(/\s+/g, '-');
-                newNav = [...prev.navigation, { ...newItem, id, isIframe: !!newItem.isIframe }];
+                newNav = [...prev.navigation, { ...newItem, id, isIframe: !!newItem.isIframe } as NavItem];
             }
 
             return { ...prev, navigation: newNav };
@@ -533,6 +534,7 @@ export default function SettingsPage() {
     };
 
     const handleSelectServer = async (srv: { token: string, url: string, name: string, machineId: string }) => {
+        if (!settings) return;
         const next = {
             ...settings,
             plex: {
@@ -541,7 +543,7 @@ export default function SettingsPage() {
                 url: srv.url,
                 serverName: srv.name,
                 machineId: srv.machineId,
-                authMethod: 'plex_login'
+                authMethod: 'plex_login' as const
             }
         };
         setSettings(next);
@@ -643,9 +645,18 @@ export default function SettingsPage() {
                     { id: 'media', label: 'Media Center', icon: 'Film', path: '/media', visible: true },
                     { id: 'proxmox', label: 'Proxmox', icon: 'Server', path: '/proxmox', visible: true },
                     { id: 'settings', label: 'Global Settings', icon: 'Settings', path: '/settings', visible: true }
-                ]
+                ],
+                weather: { location: '', apiKey: '', units: 'metric' as const },
+                appearance: {
+                    theme: 'dark',
+                    accentColor: 'var(--md-sys-color-primary)',
+                    backgroundColor: 'var(--md-sys-color-surface-container-lowest)',
+                    dayStart: 7,
+                    nightStart: 19,
+                    showHeaderStats: true
+                }
             };
-            setSettings(defaults);
+            setSettings(defaults as AppSettings);
             setToast({ message: 'Settings reset to defaults! Click Save to confirm.', type: 'success' });
         }
     };
@@ -1249,7 +1260,7 @@ export default function SettingsPage() {
                                     }}>
                                         {(() => {
                                         const coreIds = ['sonarr', 'radarr', 'plex', 'weather'];
-                                        const sortedModules = [...MODULE_MANIFESTS]
+                                        const sortedModules = [...(MODULE_MANIFESTS as ModuleManifest[])]
                                             .filter(m => !m.hidden)
                                             .sort((a, b) => {
                                                 const aCore = coreIds.includes(a.id);
@@ -1291,7 +1302,7 @@ export default function SettingsPage() {
                                                     <div style={{ fontSize: '10px', fontWeight: 900, opacity: 0.3, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{m.id}</div>
                                                 </div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                    {m.configFields?.length > 0 && (
+                                                    {(m.configFields?.length || 0) > 0 && (
                                                         <button 
                                                             onClick={() => setEditingPlugin(m)}
                                                             className="m3-press-effect"
@@ -1747,6 +1758,7 @@ export default function SettingsPage() {
                 module={editingPlugin}
                 initialSettings={settings[editingPlugin.id] || {}}
                 onSave={async (newSet) => {
+                    if (!settings) return;
                     const next = {
                         ...settings,
                         [editingPlugin.id]: {

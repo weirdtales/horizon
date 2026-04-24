@@ -1,6 +1,8 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
+import { sanitizeUrl } from '@/lib/url';
 import {
     Home, Globe, Cloud, LayoutDashboard, Settings, Wifi, Shield, Activity, 
     Image as ImageIcon, PlaySquare, Video, Eye, Network, Box, Server, 
@@ -58,10 +60,13 @@ export const DashboardIcon = ({ icon, size = 24, color, style }: DashboardIconPr
         // e.g. mdi:home, simple-icons:plex
         const url = `https://api.iconify.design/${icon}.svg?color=${encodeURIComponent(color || 'currentColor')}`;
         return (
-            <img 
+            <Image 
                 src={url} 
                 alt={icon} 
-                style={{ width: size, height: size, objectFit: 'contain', ...style }} 
+                width={size}
+                height={size}
+                style={{ objectFit: 'contain', ...style }} 
+                unoptimized
             />
         );
     }
@@ -69,10 +74,13 @@ export const DashboardIcon = ({ icon, size = 24, color, style }: DashboardIconPr
     // Handle Custom URLs
     if (icon.startsWith('http')) {
         return (
-            <img 
-                src={icon} 
+            <Image 
+                src={sanitizeUrl(icon)} 
                 alt="Custom" 
-                style={{ width: size, height: size, objectFit: 'contain', borderRadius: '4px', ...style }} 
+                width={size}
+                height={size}
+                style={{ objectFit: 'contain', borderRadius: '4px', ...style }} 
+                unoptimized
             />
         );
     }

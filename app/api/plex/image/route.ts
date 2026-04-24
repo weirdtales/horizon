@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { getPlexConnection } from '@/lib/plex';
 
 export async function GET(request: Request) {

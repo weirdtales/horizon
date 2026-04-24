@@ -16,7 +16,7 @@ export async function GET(
         const sanitizedId = encodeURIComponent(id);
         
         // Use shared logic to ensure we have a WORKING connection (Healed if necessary)
-        const { url, token, headers } = await getPlexConnection();
+        const { url, headers } = await getPlexConnection();
 
         // Fetch section contents with caching (100 recent items)
         const data = await cachedPlexFetch(

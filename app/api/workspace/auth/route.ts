@@ -2,7 +2,7 @@ import { getSettings } from '@/lib/settings';
 import { getGoogleAuthUrl } from '@/lib/google';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET() {
     const settings = getSettings();
     const workspace = (settings as any).workspace;
 
