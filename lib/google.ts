@@ -34,10 +34,10 @@ export async function exchangeCodeForToken(code: string, clientId: string, clien
         try {
             const err = await res.json();
             errorMsg = err.error_description || err.error || errorMsg;
-        } catch (e) {
+        } catch {
             try {
                 errorMsg = await res.text();
-            } catch (te) {}
+            } catch {}
         }
         throw new Error(`${errorMsg} (${res.status} ${res.statusText})`);
     }
@@ -62,10 +62,10 @@ export async function refreshAccessToken(clientId: string, clientSecret: string,
         try {
             const err = await res.json();
             errorMsg = err.error_description || err.error || errorMsg;
-        } catch (e) {
+        } catch {
             try {
                 errorMsg = await res.text();
-            } catch (te) {}
+            } catch {}
         }
         throw new Error(`${errorMsg} (${res.status} ${res.statusText})`);
     }
@@ -78,7 +78,7 @@ let tokenRefreshPromise: Promise<string> | null = null;
 
 export async function getValidToken() {
     const settings = getSettings();
-    const workspace = (settings as any).workspace;
+    const workspace = settings.workspace;
 
     if (!workspace || !workspace.accessToken) {
         throw new Error('Google Workspace not configured');

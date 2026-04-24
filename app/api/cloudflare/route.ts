@@ -38,7 +38,7 @@ export async function GET() {
         let totalCached = 0;
 
         // Fetch stats for the first few zones to build an overview
-        const analyticsPromises = zones.slice(0, 10).map((zone: any) => 
+        const analyticsPromises = zones.slice(0, 10).map((zone: { id: string }) => 
             fetch(`https://api.cloudflare.com/client/v4/zones/${zone.id}/analytics/dashboard?since=-1440`, { 
                 headers, 
                 cache: 'no-store',
@@ -55,7 +55,14 @@ export async function GET() {
         clearTimeout(timeoutId);
 
         // Track per-zone metrics too
-        const zoneMetrics: Record<string, any> = {};
+        const zoneMetrics: Record<string, {
+            requests: number;
+            bandwidth: number;
+            threats: number;
+            uniques: number;
+            pageviews: number;
+            cacheRatio: string;
+        }> = {};
 
         analyticsResults.forEach((res, index) => {
             if (res?.result?.totals) {
@@ -91,7 +98,7 @@ export async function GET() {
 
         return NextResponse.json({
             status: 'online',
-            domains: zones.map((z: any) => ({
+            domains: zones.map((z: { id: string; name: string; status: string; paused: boolean; plan?: { name: string }; name_servers: string[]; development_mode: number }) => ({
                 id: z.id,
                 name: z.name,
                 status: z.status,
@@ -111,7 +118,7 @@ export async function GET() {
             }
         });
 
-    } catch (err: any) {
+    } catch (err) {
         console.error('Cloudflare API Error:', err);
         return NextResponse.json({ 
             error: 'Failed to reach Cloudflare'

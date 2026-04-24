@@ -3,8 +3,21 @@ import { Agent } from 'undici';
 
 // Cache structure
 interface PlexCache {
-    data: any;
+    data: unknown;
     timestamp: number;
+}
+
+interface PlexConnection {
+    uri: string;
+    relay: boolean;
+    [key: string]: unknown;
+}
+
+interface PlexResource {
+    clientIdentifier: string;
+    name: string;
+    connections: PlexConnection[];
+    [key: string]: unknown;
 }
 
 // Global cache object (persists within the server instance)
@@ -12,7 +25,6 @@ const plexGlobalCache: Record<string, PlexCache> = {};
 const CACHE_TTL = 60 * 1000; // 60 seconds
 
 // Custom HTTPS agents for TLS control (Compatible with native fetch/undici)
-const secureAgent = new Agent({ keepAliveTimeout: 10 * 1000, keepAliveMaxTimeout: 10 * 1000 });
 const insecureAgent = new Agent({ 
     keepAliveTimeout: 10 * 1000, 
     keepAliveMaxTimeout: 10 * 1000,
@@ -75,7 +87,7 @@ export async function getPlexConnection() {
                 headers,
                 cache: 'no-store',
                 signal: controller.signal,
-                // @ts-ignore - Only use custom dispatcher if explicitly allowed insecure
+                // @ts-expect-error - Only use custom dispatcher if explicitly allowed insecure
                 dispatcher: allowInsecure ? insecureAgent : undefined
             });
             clearTimeout(timeoutId);
@@ -105,12 +117,12 @@ export async function getPlexConnection() {
             clearTimeout(discTimeout);
             if (discRes.ok) {
                 const discData = await discRes.json();
-                const server = discData.find((item: any) => item.clientIdentifier === plex.machineId || item.name === plex.serverName);
+                const server = discData.find((item: PlexResource) => item.clientIdentifier === plex.machineId || item.name === plex.serverName);
                 
                 if (server && server.connections) {
                     // Sort connections: Relay last (slow), Remote first, Local middle
                     // Clone to avoid mutating original settings data
-                    const sortedConns = [...server.connections].sort((a: any, b: any) => {
+                    const sortedConns = [...server.connections].sort((a: PlexConnection, b: PlexConnection) => {
                         const isRelayA = a.relay || a.uri.includes('relay.plex.direct');
                         const isRelayB = b.relay || b.uri.includes('relay.plex.direct');
                         if (isRelayA && !isRelayB) return 1;
@@ -156,7 +168,7 @@ export async function getPlexConnection() {
 /**
  * Enhanced fetch with 60s in-memory caching
  */
-export async function cachedPlexFetch(url: string, headers: any, useCache = true) {
+export async function cachedPlexFetch(url: string, headers: Record<string, string>, useCache = true) {
     const now = Date.now();
     const cacheKey = url;
 
@@ -182,7 +194,7 @@ export async function cachedPlexFetch(url: string, headers: any, useCache = true
             headers, 
             cache: 'no-store',
             signal: controller.signal,
-            // @ts-ignore
+            // @ts-expect-error
             dispatcher: allowInsecure ? insecureAgent : undefined
         });
         

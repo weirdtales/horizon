@@ -16,10 +16,16 @@ const WEATHER_CODES: Record<number, string> = {
 
 import { AppSettings } from '@/lib/types';
 
+interface WeatherData {
+    temp: number;
+    high: number;
+    description: string;
+}
+
 // Simplified internal hook for the module
 function useWeather(settings: AppSettings['weather']) {
     const { apiKey, location = 'London', units = 'metric' } = settings || {};
-    const [weatherData, setWeatherData] = useState<any>(null);
+    const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
     const [loading, setLoading] = useState(false);
     const [hasLocationError, setHasLocationError] = useState(false);
     const [time, setTime] = useState(new Date());
@@ -86,8 +92,8 @@ function useWeather(settings: AppSettings['weather']) {
                         setWeatherData(null);
                     }
                 }
-            } catch (err: any) {
-                if (err.name !== 'AbortError') {
+            } catch (err) {
+                if ((err as Error).name !== 'AbortError') {
                     console.error('Weather fetch failed:', err);
                     setWeatherData(null);
                 }
@@ -130,8 +136,8 @@ const WeatherIcon = ({ condition, size }: { condition: string, size: number }) =
     return <Cloud {...iconProps} color="var(--md-color-weather-mist)" />;
 };
 
-export default function WeatherWidget({ settings }: { settings?: any }) {
-    const w = settings?.weather || { location: 'Stockholm', units: 'metric' };
+export default function WeatherWidget({ settings }: { settings?: AppSettings }) {
+    const w = settings?.weather || { location: 'London', units: 'metric' };
     const { time, loading, isMetric, temp, description, high, hasLocationError } = useWeather(w);
 
     return (
@@ -139,7 +145,7 @@ export default function WeatherWidget({ settings }: { settings?: any }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                     <div style={{ fontSize: '12px', fontWeight: 900, color: 'var(--md-sys-color-primary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>
-                        {(typeof w.location !== 'string' || w.location.toUpperCase() === 'ABOUT:BLANK') ? 'Stockholm' : w.location}
+                        {(typeof w.location !== 'string' || w.location.toUpperCase() === 'ABOUT:BLANK') ? 'London' : w.location}
                     </div>
                     <div style={{ fontSize: 'clamp(2rem, 10vw, 4rem)', fontWeight: 900, lineHeight: 0.9, letterSpacing: '-3px', color: 'var(--md-sys-color-on-surface)' }}>
                         {time.getHours().toString().padStart(2, '0')}<span style={{ opacity: 0.3 }}>:</span>{time.getMinutes().toString().padStart(2, '0')}

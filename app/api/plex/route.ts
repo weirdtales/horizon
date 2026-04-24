@@ -12,11 +12,18 @@ export async function GET() {
             cachedPlexFetch(`${url}/library/sections`, headers)
         ]);
 
-        const directories = libraryData.MediaContainer?.Directory || [];
+        interface PlexDirectory {
+            key: string;
+            title: string;
+            type: string;
+            updatedAt: number;
+        }
+
+        const directories = (libraryData as any).MediaContainer?.Directory || [];
 
         // Fetch counts for libraries (Cache individual library responses too)
         const detailedLibraries = await Promise.all(
-            directories.slice(0, 5).map(async (d: any) => {
+            directories.slice(0, 5).map(async (d: PlexDirectory) => {
                 try {
                     const data = await cachedPlexFetch(`${url}/library/sections/${d.key}/all?X-Plex-Container-Start=0&X-Plex-Container-Size=0`, headers);
                     return {
@@ -26,7 +33,7 @@ export async function GET() {
                         count: parseInt(data.MediaContainer?.totalSize || '0'),
                         updatedAt: d.updatedAt
                     };
-                } catch (e) {
+                } catch {
                     return { id: d.key, title: d.title, type: d.type, count: 0, updatedAt: d.updatedAt };
                 }
             })
@@ -42,7 +49,7 @@ export async function GET() {
                 platform: identity?.platform || 'Unknown',
                 machineId: identity?.machineIdentifier || 'unknown-id',
             },
-            sessions: sessionsData.MediaContainer?.Metadata?.map((m: any) => ({
+            sessions: (sessionsData as any).MediaContainer?.Metadata?.map((m: any) => ({
                 title: m.title,
                 parentTitle: m.parentTitle || m.grandparentTitle,
                 user: m.User?.title,
@@ -57,11 +64,12 @@ export async function GET() {
             libraries: detailedLibraries
         });
 
-    } catch (err: any) {
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Connection Failed';
         console.error('Plex connection API error:', err);
         return NextResponse.json({ 
             status: 'offline',
-            error: err.message || 'Connection Failed'
+            error: message
         }, { status: 500 });
     }
 }

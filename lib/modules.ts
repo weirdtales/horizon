@@ -1,4 +1,3 @@
-import { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export interface ModuleManifest {
@@ -23,11 +22,11 @@ export interface ConfigField {
     label: string;
     type: 'text' | 'password' | 'number' | 'url';
     placeholder?: string;
-    defaultValue?: any;
+    defaultValue?: unknown;
     helpText?: string;
 }
 
-export interface ModuleDefinition<TSettings = any> extends ModuleManifest {
+export interface ModuleDefinition<TSettings = unknown> extends ModuleManifest {
     widget?: (props: { settings: TSettings }) => ReactNode;
     view?: (props: { settings: TSettings }) => ReactNode;
 }

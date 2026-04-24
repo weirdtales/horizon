@@ -47,5 +47,6 @@ next-env.d.ts
 # agent & debug
 .claude/
 scratch/
+lint_results*.txt
 .DS_Store
 Thumbs.db

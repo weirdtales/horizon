@@ -1,15 +1,13 @@
 "use client";
 
-import Link from 'next/link';
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import {
-    Globe, Cloud, Film, Download, Wifi, ArrowRight, ShieldCheck, 
-    CloudRain, ArrowUpCircle, GripHorizontal, X, Plus, Save, Home, Box, 
-    Shield, Network, Activity as Pulse, Activity, Image as ImageIcon, PlaySquare, Video, 
-    Power, Lock, Database, Maximize2, Minimize2, Search, Loader2,
-    Server, Cpu, HardDrive, Mail, ListTodo, StickyNote, PencilLine, Eye, EyeOff,
-    LayoutGrid, Calendar, Zap, Clock, ChevronRight, Trash, Settings2, Settings,
-    Palette, Layers, ArrowRightLeft, Fingerprint, RefreshCw, Sun, GripVertical
+    Globe, Cloud, Film, Wifi, ArrowRight,
+    CloudRain, ArrowUpCircle, X, Plus, Save, Box, 
+    Shield, Image as ImageIcon, PlaySquare, Video, 
+    Loader2, Home, Activity,
+    Server, LayoutGrid, Zap, Clock, Trash, Settings2,
+    Palette, Layers, ArrowRightLeft, Sun, GripVertical
 } from 'lucide-react';
 import { sanitizeUrl } from '../lib/url';
 import { DashboardRow, DashboardSection, AppSettings } from '../lib/types';
@@ -19,7 +17,6 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 import 'react-grid-layout/css/styles.css';
 
 import { useWeather } from './hooks/useWeather';
-import { useService } from './hooks/useService';
 import { DashboardIcon } from './components/DashboardIcon';
 import { MD3Toast, ToastType } from './components/MD3Toast';
 import { useMobile } from './hooks/useMobile';
@@ -40,23 +37,6 @@ const WIDGET_SIZE_DEFAULTS: Record<string, string> = {
     'workspace': 'large',
     'media': 'large',
     'example-hello': 'small'
-};
-
-const WIDGET_ALLOWED_SIZES: Record<string, string[]> = {
-    'weather':       ['compact', 'small', 'wide', 'tall', 'large'],
-    'loopia':        ['compact', 'small', 'wide', 'large'],
-    'cloudflare':    ['compact', 'small', 'wide', 'large'],
-    'unifi':         ['compact', 'small', 'wide', 'large'],
-    'homeassistant': ['compact', 'small', 'wide', 'large'],
-    'uptimekuma':    ['compact', 'small', 'wide', 'large', 'full'],
-    'plex':          ['compact', 'small', 'wide', 'large'],
-    'radarr':        ['compact', 'small', 'wide', 'large'],
-    'sonarr':        ['compact', 'small', 'wide', 'large'],
-    'proxmox':       ['compact', 'small', 'wide', 'large'],
-    'npm':           ['compact', 'small', 'wide', 'large'],
-    'workspace':     ['compact', 'small', 'large', 'full'],
-    'media':         ['compact', 'small', 'wide', 'large', 'full'],
-    'example-hello': ['compact', 'small', 'wide'],
 };
 
 const WIDGET_DIMENSIONS: Record<string, { w: number, h: number }> = {
@@ -82,8 +62,8 @@ const V_THEME_LABELS: Record<string, { label: string, desc: string }> = {
 
 import { MODULE_WIDGETS } from '@/lib/registry';
 
-const WIDGETS_DEF: Record<string, { name: string, icon: any, color: string, render: (settings?: any) => React.ReactNode }> = {
-    'weather':       { name: 'Weather / Clock',      icon: CloudRain, color: '#a8c7fa', render: (settings: any) => { const W = MODULE_WIDGETS['weather']; return W ? <W settings={settings} /> : null; } },
+const WIDGETS_DEF: Record<string, { name: string, icon: React.ElementType, color: string, render: (settings: AppSettings | null) => React.ReactNode }> = {
+    'weather':       { name: 'Weather / Clock',      icon: CloudRain, color: '#a8c7fa', render: (settings) => { const W = MODULE_WIDGETS['weather']; return W ? <W settings={settings?.weather} /> : null; } },
     'loopia':        { name: 'Loopia',               icon: Globe,    color: '#3b82f6', render: () => { const W = MODULE_WIDGETS['loopia']; return W ? <W /> : null; } },
     'cloudflare':    { name: 'Cloudflare',           icon: Cloud,    color: '#f38020', render: () => { const W = MODULE_WIDGETS['cloudflare']; return W ? <W /> : null; } },
     'unifi':         { name: 'UniFi Network',        icon: Wifi,     color: '#0559C9', render: () => { const W = MODULE_WIDGETS['unifi']; return W ? <W /> : null; } },
@@ -144,7 +124,16 @@ export default function DashboardHub() {
         editModeRef.current = editMode;
     }, [editMode]);
     
-    const [editorState, setEditorState] = useState<any>({ isOpen: false, type: 'row', mode: 'add', name: '', hideTitle: false });
+    const [editorState, setEditorState] = useState<{
+        isOpen: boolean;
+        type: 'row' | 'section';
+        mode: 'add' | 'edit';
+        name: string;
+        hideTitle: boolean;
+        rowIdx?: number;
+        sectionIdx?: number;
+        layout?: string;
+    }>({ isOpen: false, type: 'row', mode: 'add', name: '', hideTitle: false });
     const [addingToSection, setAddingToSection] = useState<{ rowIdx: number, sectionIdx: number } | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<{ type: 'row' | 'section', rowIdx: number, sectionIdx?: number } | null>(null);
 
@@ -201,19 +190,18 @@ export default function DashboardHub() {
         };
     }, []);
 
-    const allActiveWidgets = useMemo(() => rows.flatMap((r: any) => r.sections.flatMap((s: any) => s.layout)), [rows]);
 
 
     const handleRemove = useCallback((rowIdx: number, sectionIdx: number, id: string) => {
-        setRows(prev => prev.map((row: any, rIdx: number) => {
+        setRows(prev => prev.map((row: DashboardRow, rIdx: number) => {
             if (rIdx !== rowIdx) return row;
             return {
                 ...row,
-                sections: row.sections.map((sec: any, sIdx: number) => {
+                sections: row.sections.map((sec: DashboardSection, sIdx: number) => {
                     if (sIdx !== sectionIdx) return sec;
                     return { 
                         ...sec, 
-                        layout: sec.layout.filter((w: any) => {
+                        layout: sec.layout.filter((w: DashboardLayoutItem) => {
                             const itemId = typeof w === 'string' ? w : w.i;
                             return itemId !== id;
                         }) 
@@ -277,20 +265,20 @@ export default function DashboardHub() {
         { name: 'Cyan', color: '#4DD0E1' }
     ];
     const handleMoveWidget = (fromRowIdx: number, fromSectionIdx: number, toSectionIdx: number, widgetId: string) => {
-        setRows(prev => prev.map((row: any, rIdx: number) => {
+        setRows(prev => prev.map((row: DashboardRow, rIdx: number) => {
             if (rIdx !== fromRowIdx) return row;
             
             const fromSec = row.sections[fromSectionIdx];
-            const toSec = row.sections[toSectionIdx];
+            // const toSec = row.sections[toSectionIdx];
             
-            const widget = fromSec.layout.find((w: any) => (typeof w === 'string' ? w : w.i) === widgetId);
+            const widget = fromSec.layout.find((w: DashboardLayoutItem) => (typeof w === 'string' ? w : (w as { i: string }).i) === widgetId);
             if (!widget) return row;
 
             return {
                 ...row,
-                sections: row.sections.map((sec: any, sIdx: number) => {
+                sections: row.sections.map((sec: DashboardSection, sIdx: number) => {
                     if (sIdx === fromSectionIdx) {
-                        return { ...sec, layout: sec.layout.filter((w: any) => (typeof w === 'string' ? w : w.i) !== widgetId) };
+                        return { ...sec, layout: sec.layout.filter((w: DashboardLayoutItem) => (typeof w === 'string' ? w : (w as { i: string }).i) !== widgetId) };
                     }
                     if (sIdx === toSectionIdx) {
                         return { ...sec, layout: [...sec.layout, widget] };
@@ -303,13 +291,13 @@ export default function DashboardHub() {
     };
 
     const handleReorderWidget = (rowIdx: number, sectionIdx: number, widgetId: string, direction: 'up' | 'down') => {
-        setRows(prev => prev.map((row: any, rIdx: number) => {
+        setRows(prev => prev.map((row: DashboardRow, rIdx: number) => {
             if (rIdx !== rowIdx) return row;
             return {
                 ...row,
-                sections: row.sections.map((sec: any, sIdx: number) => {
+                sections: row.sections.map((sec: DashboardSection, sIdx: number) => {
                     if (sIdx !== sectionIdx) return sec;
-                    const index = sec.layout.findIndex((w: any) => (typeof w === 'string' ? w : w.i) === widgetId);
+                    const index = sec.layout.findIndex((w: DashboardLayoutItem) => (typeof w === 'string' ? w : (w as { i: string }).i) === widgetId);
                     if (index === -1) return sec;
                     
                     const newLayout = [...sec.layout];
@@ -329,11 +317,11 @@ export default function DashboardHub() {
     const handleExecuteDelete = () => {
         if (!confirmDelete) return;
         if (confirmDelete.type === 'row') {
-            setRows(prev => prev.filter((_: any, i: number) => i !== confirmDelete.rowIdx));
+            setRows(prev => prev.filter((_: DashboardRow, i: number) => i !== confirmDelete.rowIdx));
         } else {
-            setRows(prev => prev.map((r: any, ri: number) => 
+            setRows(prev => prev.map((r: DashboardRow, ri: number) => 
                 ri === confirmDelete.rowIdx 
-                    ? { ...r, sections: r.sections.filter((_: any, si: number) => si !== confirmDelete.sectionIdx) } 
+                    ? { ...r, sections: r.sections.filter((_: DashboardSection, si: number) => si !== confirmDelete.sectionIdx) } 
                     : r
             ));
         }
@@ -343,24 +331,24 @@ export default function DashboardHub() {
     // --- Grid Interaction Handlers ---
 
 
-    const handleLayoutChange = useCallback((layout: readonly any[], rowIdx: number, sectionIdx: number) => {
+    const handleLayoutChange = useCallback((layout: readonly DashboardLayoutItem[], rowIdx: number, sectionIdx: number) => {
         if (!editMode) return;
         
-        setRows(prev => prev.map((row: any, rIdx: number) => {
+        setRows(prev => prev.map((row: DashboardRow, rIdx: number) => {
             if (rIdx !== rowIdx) return row;
             return {
                 ...row,
-                sections: row.sections.map((sec: any, sIdx: number) => {
+                sections: row.sections.map((sec: DashboardSection, sIdx: number) => {
                     if (sIdx !== sectionIdx) return sec;
                     // STORE FULL LAYOUT OBJECTS for persistence and zero shifts
-                    return { ...sec, layout: layout };
+                    return { ...sec, layout: layout as DashboardLayoutItem[] };
                 })
             };
         }));
     }, [editMode]);
 
 
-    const handleResizeStop = useCallback((layout: readonly any[], oldItem: any, newItem: any) => {
+    const handleResizeStop = useCallback((layout: readonly DashboardLayoutItem[], oldItem: { i: string }, newItem: { i: string, w: number, h: number }) => {
         if (!editMode) return;
         setWidgetSizes(prev => ({
             ...prev,
@@ -388,7 +376,7 @@ export default function DashboardHub() {
                 ...dashboardBgStyle,
                 '--md-sys-color-primary': appearance.accentColor || '#3b82f6',
                 '--md-sys-color-primary-container': `${appearance.accentColor || '#3b82f6'}33`,
-            } as any}
+            } as React.CSSProperties}
         >
         <div className="page-container" style={{ 
                 padding: isMobile ? (editMode ? '100px 16px 200px 16px' : '24px 16px 80px 16px') : '64px 48px',
@@ -598,14 +586,11 @@ export default function DashboardHub() {
                             flexWrap: 'wrap',
                             width: '100%'
                         }}>
-                        {row.sections.map((section: DashboardSection, sIdx: number) => {
-                            const sectionCount = row.sections.length;
-                            const percentage = Math.round(100 / sectionCount);
-                            return (
+                        {row.sections.map((section: DashboardSection, sIdx: number) => (
                                 <div key={section.id} style={{ 
                                     marginBottom: '48px',
                                     flex: row.layout === 'split' && !isMobile ? `1 1 0px` : 'none',
-                                    width: row.layout === 'split' && !isMobile ? `calc(${100/sectionCount}% - ${(32*(sectionCount-1))/sectionCount}px)` : '100%',
+                                    width: row.layout === 'split' && !isMobile ? `calc(${100/row.sections.length}% - ${(32*(row.sections.length-1))/row.sections.length}px)` : '100%',
                                     minWidth: row.layout === 'split' && !isMobile ? (isMobile ? '100%' : '400px') : '100%'
                                 }}>
                                     {/* Section Header */}
@@ -629,7 +614,7 @@ export default function DashboardHub() {
                                                     <Settings2 size={14} />
                                                 </button>
                                                 
-                                                {sectionCount > 1 && (
+                                                {row.sections.length > 1 && (
                                                     <button
                                                         onMouseDown={(e) => e.stopPropagation()}
                                                         onClick={() => setConfirmDelete({ type: 'section', rowIdx: rIdx, sectionIdx: sIdx })}
@@ -680,12 +665,12 @@ export default function DashboardHub() {
                                             onLayoutChange={(l) => handleLayoutChange(l, rIdx, sIdx)}
                                             onResizeStop={handleResizeStop}
                                         >
-                                            {section.layout.map((item: any) => {
-                                                const id = typeof item === 'string' ? item : item.i;
+                                            {section.layout.map((item: DashboardLayoutItem) => {
+                                                const id = typeof item === 'string' ? item : (item as { i: string }).i;
                                                 const isBookmark = id.startsWith('bookmark-');
 
                                                 const bookmark = isBookmark ? bookmarks.find(b => b.id === id.replace('bookmark-', '')) : null;
-                                                const wDef = isBookmark ? { name: bookmark.name, icon: Globe, color: 'var(--md-sys-color-primary)', render: () => (
+                                                const wDef = isBookmark && bookmark ? { name: bookmark.name, icon: Globe, color: 'var(--md-sys-color-primary)', render: () => (
                                                     <div onClick={() => !editMode && window.open(sanitizeUrl(bookmark.url), '_blank')} style={{ height: '100%', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer' }}>
                                                         <div style={{ backgroundColor: (bookmark.color || 'var(--md-sys-color-primary)') + '20', color: bookmark.color || 'var(--md-sys-color-primary)', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
                                                             <DashboardIcon icon={bookmark.icon} size={24} />
@@ -697,7 +682,7 @@ export default function DashboardHub() {
 
                                                 if (!wDef) return <div key={id} style={{ height: '100%', background: 'var(--md-sys-color-error-container)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Widget Missing: {id}</div>;
 
-                                                const visuals = (widgetVisuals[id] || { theme: 'default', opacity: 1 }) as any;
+                                                const visuals = (widgetVisuals[id] || { theme: 'default', opacity: 1 });
                                                 const accentRgb = hexToRgb(appearance.accentColor || '#3b82f6');
                                                 const customRgb = visuals.customColor ? hexToRgb(visuals.customColor) : null;
                                                 
@@ -801,7 +786,7 @@ export default function DashboardHub() {
                                                             <div className="no-drag" style={{ position: 'absolute', bottom: '64px', right: '16px', width: '200px', background: 'var(--md-sys-color-surface-container-high)', borderRadius: '24px', padding: '16px', boxShadow: 'var(--md-sys-elevation-5)', zIndex: 110, border: '1px solid var(--md-sys-color-outline-variant)', animation: 'fadeInScale 0.2s cubic-bezier(0.2, 0.0, 0, 1.0)' }}>
                                                                 <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--md-sys-color-primary)', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.05em' }}>Move Module to...</div>
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                    {row.sections.map((targetSec: any, tsIdx: number) => {
+                                                                    {row.sections.map((targetSec: DashboardSection, tsIdx: number) => {
                                                                         if (tsIdx === sIdx) return null;
                                                                         return (
                                                                             <button 
@@ -885,13 +870,12 @@ export default function DashboardHub() {
                                                 );
                                             })}
                                         </ResponsiveGridLayout>
-                                    </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            ))}
+                                </div>
+                            ))}
+                        </div>
+                        </div>
+                ))}
             </div>
         </div>
 
@@ -1050,7 +1034,7 @@ export default function DashboardHub() {
                                             onClick={() => {
                                                 const nr = [...rows];
                                                 const sec = nr[addingToSection.rowIdx].sections[addingToSection.sectionIdx];
-                                                const maxY = sec.layout.reduce((max: number, item: any) => {
+                                                const maxY = sec.layout.reduce((max: number, item: DashboardLayoutItem) => {
                                                     const y = typeof item === 'string' ? 0 : (item.y || 0);
                                                     const h = typeof item === 'string' ? 2 : (item.h || 2);
                                                     return Math.max(max, y + h);
@@ -1105,7 +1089,7 @@ export default function DashboardHub() {
                                             const nr = [...rows];
                                             const sec = nr[addingToSection.rowIdx].sections[addingToSection.sectionIdx];
                                             const mid = `bookmark-${b.id}`;
-                                            const maxY = sec.layout.reduce((max: number, item: any) => {
+                                            const maxY = sec.layout.reduce((max: number, item: DashboardLayoutItem) => {
                                                 const y = typeof item === 'string' ? 0 : (item.y || 0);
                                                 const h = typeof item === 'string' ? 2 : (item.h || 2);
                                                 return Math.max(max, y + h);

@@ -16,15 +16,20 @@ export interface Bookmark {
     size?: 'square' | 'wide';
 }
 
+export type DashboardLayoutItem = string | { i: string; x: number; y: number; w: number; h: number; [key: string]: any };
+
 export interface DashboardSection {
     id: string;
     name: string;
-    layout: string[];
+    hideTitle?: boolean;
+    layout: DashboardLayoutItem[];
 }
 
 export interface DashboardRow {
     id: string;
     name: string;
+    hideTitle?: boolean;
+    layout?: 'stacked' | 'split';
     sections: DashboardSection[];
 }
 

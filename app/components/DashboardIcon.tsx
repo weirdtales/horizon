@@ -13,7 +13,7 @@ import {
     X, Plus, Save, Pencil, Download, Upload, RefreshCcw, Layout
 } from 'lucide-react';
 
-export const ICON_COMPONENTS: Record<string, any> = {
+export const ICON_COMPONENTS: Record<string, React.ElementType> = {
     Home, Globe, LayoutDashboard, Settings, Cloud, Wifi, Shield, Activity, 
     ImageIcon, PlaySquare, Video, Eye, Network, Box, Server,
     Search, Database, Cpu, HardDrive, Bell, Mail, ListTodo, StickyNote, Lock, Unlock, 

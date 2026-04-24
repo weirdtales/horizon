@@ -87,8 +87,8 @@ export default function RootLayout({
                     if (data.settings.navigation) {
                         // Merge modular views into navigation if enabled (explicitly true)
                         const modularNavItems = MODULE_MANIFESTS
-                            .filter((m: any) => MODULE_VIEWS[m.id] && (data.settings.modules?.[m.id]?.enabled === true) && !m.hidden)
-                            .map((m: any) => ({
+                            .filter((m: ModuleManifest) => MODULE_VIEWS[m.id] && ((data.settings.modules as any)?.[m.id]?.enabled === true) && !m.hidden)
+                            .map((m: ModuleManifest) => ({
                                 id: m.id,
                                 label: m.name,
                                 icon: m.icon,
@@ -97,7 +97,7 @@ export default function RootLayout({
                             }));
                         
                         // Deduplicate: user settings take precedence
-                        const existingIds = new Set(data.settings.navigation.map((n: any) => n.id));
+                        const existingIds = new Set(data.settings.navigation.map((n: NavItem) => n.id));
                         const combinedNav = [
                             ...data.settings.navigation,
                             ...modularNavItems.filter((m: any) => !existingIds.has(m.id))
@@ -146,14 +146,19 @@ export default function RootLayout({
         refreshSettings();
         
         // Detect if we are in an iframe safely
-        try {
-            if (typeof window !== 'undefined') {
-                setIsEmbedded(window.self !== window.top);
+        const checkEmbedding = () => {
+            try {
+                if (typeof window !== 'undefined') {
+                    const embedded = window.self !== window.top;
+                    setIsEmbedded(embedded);
+                }
+            } catch (e) {
+                // SecurityError means cross-origin iframe
+                setIsEmbedded(true);
             }
-        } catch (e) {
-            // SecurityError means cross-origin iframe
-            setIsEmbedded(true);
-        }
+        };
+
+        checkEmbedding();
 
         const handleSettingsUpdate = () => refreshSettings();
         window.addEventListener('dashboard-settings-updated', handleSettingsUpdate);

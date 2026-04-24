@@ -14,16 +14,18 @@ export function useMobile(breakpoint = 600) {
     const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
-        setIsHydrated(true);
         const checkMobile = () => {
             setIsMobile(window.innerWidth < breakpoint);
         };
 
-        // Initial check
         checkMobile();
-
+        const handle = requestAnimationFrame(() => setIsHydrated(true));
+        
         window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+            cancelAnimationFrame(handle);
+        };
     }, [breakpoint]);
 
     return isHydrated ? isMobile : false;

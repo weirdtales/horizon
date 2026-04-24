@@ -4,6 +4,7 @@ import React from 'react';
 import adguardManifest from '@/modules/adguard/module.json';
 import cloudflareManifest from '@/modules/cloudflare/module.json';
 import dockgeManifest from '@/modules/dockge/module.json';
+import example_helloManifest from '@/modules/example-hello/module.json';
 import glancesManifest from '@/modules/glances/module.json';
 import homeassistantManifest from '@/modules/homeassistant/module.json';
 import immichManifest from '@/modules/immich/module.json';
@@ -19,12 +20,12 @@ import unifiManifest from '@/modules/unifi/module.json';
 import uptimekumaManifest from '@/modules/uptimekuma/module.json';
 import weatherManifest from '@/modules/weather/module.json';
 import workspaceManifest from '@/modules/workspace/module.json';
-import exampleHelloManifest from '@/modules/example-hello/module.json';
 
 export const MODULE_MANIFESTS = [
     adguardManifest,
     cloudflareManifest,
     dockgeManifest,
+    example_helloManifest,
     glancesManifest,
     homeassistantManifest,
     immichManifest,
@@ -40,13 +41,13 @@ export const MODULE_MANIFESTS = [
     uptimekumaManifest,
     weatherManifest,
     workspaceManifest,
-    exampleHelloManifest,
 ];
 
 export const MODULE_WIDGETS: Record<string, any> = {
     'adguard': dynamic(() => import('@/modules/adguard/widget')),
     'cloudflare': dynamic(() => import('@/modules/cloudflare/widget')),
     'dockge': dynamic(() => import('@/modules/dockge/widget')),
+    'example-hello': dynamic(() => import('@/modules/example-hello/widget')),
     'glances': dynamic(() => import('@/modules/glances/widget')),
     'homeassistant': dynamic(() => import('@/modules/homeassistant/widget')),
     'immich': dynamic(() => import('@/modules/immich/widget')),
@@ -62,16 +63,15 @@ export const MODULE_WIDGETS: Record<string, any> = {
     'uptimekuma': dynamic(() => import('@/modules/uptimekuma/widget')),
     'weather': dynamic(() => import('@/modules/weather/widget')),
     'workspace': dynamic(() => import('@/modules/workspace/widget')),
-    'example-hello': dynamic(() => import('@/modules/example-hello/widget')),
 };
 
 export const MODULE_VIEWS: Record<string, any> = {
     'cloudflare': dynamic(() => import('@/modules/cloudflare/view')),
+    'example-hello': dynamic(() => import('@/modules/example-hello/view')),
     'loopia': dynamic(() => import('@/modules/loopia/view')),
     'plex': dynamic(() => import('@/modules/plex/view')),
     'radarr': dynamic(() => import('@/modules/radarr/view')),
     'sonarr': dynamic(() => import('@/modules/sonarr/view')),
-    'example-hello': dynamic(() => import('@/modules/example-hello/view')),
 };
 
 

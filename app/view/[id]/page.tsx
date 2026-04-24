@@ -16,7 +16,7 @@ export default function ModularViewPage({ params }: { params: Promise<{ id: stri
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px' }}>
                 <ShieldAlert size={48} color="var(--md-sys-color-error)" />
                 <h2 style={{ fontSize: '24px', fontWeight: 700 }}>Module View Not Found</h2>
-                <p style={{ opacity: 0.6 }}>The plugin '{id}' does not provide a full-page view.</p>
+                <p style={{ opacity: 0.6 }}>The plugin &apos;{id}&apos; does not provide a full-page view.</p>
                 <BackButton />
             </div>
         );

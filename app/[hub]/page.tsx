@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 // Registry of available modules
 // In a future update, this can be auto-generated or fetched from an API
-const MODULE_VIEWS: Record<string, any> = {
+const MODULE_VIEWS: Record<string, React.ComponentType> = {
     'sonarr': dynamic(() => import('@/modules/sonarr/view'), { loading: () => <ModuleLoading /> }),
     'radarr': dynamic(() => import('@/modules/radarr/view'), { loading: () => <ModuleLoading /> }),
     'plex': dynamic(() => import('@/modules/plex/view'), { loading: () => <ModuleLoading /> }),
@@ -36,7 +36,7 @@ export default function DynamicHubPage() {
                 <AlertCircle size={64} color="var(--md-sys-color-error)" strokeWidth={1.5} />
                 <h1 style={{ fontSize: '32px', fontWeight: 900, marginTop: '24px', letterSpacing: '-0.02em' }}>Module Not Found</h1>
                 <p style={{ opacity: 0.6, maxWidth: '440px', fontSize: '16px', lineHeight: 1.6 }}>
-                    The module <strong>"{hubId}"</strong> is not installed or does not have a registered full view.
+                    The module <strong>&quot;{hubId}&quot;</strong> is not installed or does not have a registered full view.
                 </p>
                 <Link href="/" style={{ marginTop: '32px', padding: '12px 32px', borderRadius: '24px', background: 'var(--md-sys-color-primary)', color: 'var(--md-sys-color-on-primary)', textDecoration: 'none', fontWeight: 800, fontSize: '14px' }}>
                     Return to Dashboard

@@ -12,7 +12,7 @@ const client = xmlrpc.createSecureClient({
   path: '/RPCSERV',
 });
 
-export const callLoopia = (method: string, args: any[] = []): Promise<any> => {
+export const callLoopia = (method: string, args: unknown[] = []): Promise<unknown> => {
   return new Promise((resolve, reject) => {
     const settings = getSettings();
 

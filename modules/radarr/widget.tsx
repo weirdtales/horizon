@@ -48,7 +48,7 @@ export default function RadarrWidget() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
                 {hasQueue ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {data.queue.slice(0, 2).map((item: any) => (
+                        {data.queue.slice(0, 2).map((item: { id: string | number; title: string; progress: number }) => (
                             <div key={item.id}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                                     <span style={{ fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80%' }}>{item.title}</span>

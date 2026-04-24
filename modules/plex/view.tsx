@@ -23,8 +23,29 @@ interface PlexSession {
     art: string | null;
 }
 
+interface PlexLibrary {
+    key: string;
+    type: string;
+    title: string;
+    count: number;
+}
+
+interface PlexData {
+    sessions: PlexSession[];
+    libraries: PlexLibrary[];
+}
+
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    sub: string;
+    icon: React.ElementType;
+    color: string;
+    delay?: number;
+}
+
 export default function PlexView() {
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<PlexData | null>(null);
     const isMobile = useMobile(1024);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -46,8 +67,9 @@ export default function PlexView() {
                 setData(apiData);
                 setError(null);
             }
-        } catch (err: any) {
-            setError(err.message || 'Failed to reach Plex Media Server');
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Failed to reach Plex Media Server';
+            setError(message);
             setToast({ message: 'Communication severed with Plex Hub.', type: 'error' });
         } finally {
             setLoading(false);
@@ -60,7 +82,7 @@ export default function PlexView() {
         return () => clearInterval(interval);
     }, []);
 
-    const StatCard = ({ title, value, sub, icon: Icon, color, delay = 0 }: any) => (
+    const StatCard = ({ title, value, sub, icon: Icon, color, delay = 0 }: StatCardProps) => (
         <div 
             className="md3-card-elevated" 
             style={{ 
@@ -121,7 +143,7 @@ export default function PlexView() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
                     <StatCard title="Active Streams" value={data?.sessions?.length || 0} sub="Real-time playback" icon={Activity} color="#4ade80" delay={0.1} />
-                    <StatCard title="Library Capacity" value={data?.libraries?.reduce((acc: number, l: any) => acc + (Number(l.count) || 0), 0) || 0} sub="Managed items" icon={Database} color="#eab308" delay={0.2} />
+                    <StatCard title="Library Capacity" value={data?.libraries?.reduce((acc: number, l: PlexLibrary) => acc + (Number(l.count) || 0), 0) || 0} sub="Managed items" icon={Database} color="#eab308" delay={0.2} />
                     <StatCard title="Storage Nodes" value={data?.libraries?.length || 0} sub="Active directories" icon={Layers} color="#60a5fa" delay={0.3} />
                     <StatCard title="Server Status" value={error ? "OFFLINE" : "ONLINE"} sub={error ? "Link severed" : "Low-latency link"} icon={ShieldCheck} color={error ? "var(--md-sys-color-error)" : "#4ade80"} delay={0.4} />
                 </div>

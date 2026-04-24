@@ -2,29 +2,27 @@
 
 import React, { useEffect, useState, Fragment } from 'react';
 import {
-    Save, AlertCircle, CheckCircle, Globe, Cloud, Wifi, Shield, 
-    Network, Eye, EyeOff, Trash, Link as LinkIcon, Activity,
-    Download, Upload, RefreshCcw, Database, Cpu, Server, Video,
-    PlaySquare, Film, Box, ImageIcon, Home as HomeIcon, Pencil,
+    Save, Globe, Cloud, Wifi, 
+    Trash, Activity, RefreshCw, RefreshCcw, Link as LinkIcon, Eye, EyeOff,
+    Download, Upload, Database, Server,
+    PlaySquare, Pencil,
     ChevronUp, ChevronDown, Plus, ExternalLink,
     Palette, Monitor, Sun, Moon, Clock, ArrowLeft, Search, Mic, Check,
-    RefreshCw, Layers, Info, ChevronRight, CheckCircle2, XCircle,
-    Zap, Loader2, ArrowRightLeft, ShieldCheck, Settings as SettingsIcon,
-    Globe as GlobeIcon, Smartphone, History as HistoryIcon
+    Layers, Info, ChevronRight,
+    Zap, Loader2, ArrowRightLeft, Settings as SettingsIcon,
 } from 'lucide-react';
 
 
 
 
 
-import { NavItem } from '@/lib/types';
+import { NavItem, AppSettings, ModuleManifest, Bookmark } from '@/lib/types';
 import { BackButton } from '../components/BackButton';
 import { DashboardIcon, COMMON_ICONS } from '../components/DashboardIcon';
 import { MD3Toast, ToastType } from '../components/MD3Toast';
 import { sanitizeUrl, sanitizeText } from '@/lib/url';
 import changelogData from '@/lib/changelog.json';
 import { MODULE_MANIFESTS, MODULE_VIEWS } from '@/lib/registry';
-import { ModuleManifest } from '@/lib/types';
 import { ModuleSettingsDialog } from '../components/ModuleSettingsDialog';
 
 // Mapping of IDs to categories for consistent grouping
@@ -65,15 +63,15 @@ const SETTINGS_MAP = (MODULE_MANIFESTS as ModuleManifest[])
 
 
 export default function SettingsPage() {
-    const [settings, setSettings] = useState<any>(null);
-    const [initialSettings, setInitialSettings] = useState<any>(null);
+    const [settings, setSettings] = useState<AppSettings | null>(null);
+    const [initialSettings, setInitialSettings] = useState<AppSettings | null>(null);
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
     const [editingIconId, setEditingIconId] = useState<string | null>(null);
     const [iconSearch, setIconSearch] = useState('');
     const [isAddingItem, setIsAddingItem] = useState(false);
-    const [newItem, setNewItem] = useState<Partial<NavItem>>({ label: '', path: '', icon: 'LinkIcon', visible: true, isIframe: false });
-    const [editingPlugin, setEditingPlugin] = useState<any | null>(null);
+    const [newItem, setNewItem] = useState<Partial<NavItem>>({ label: '', path: '', icon: 'Link', visible: true, isIframe: false });
+    const [editingPlugin, setEditingPlugin] = useState<ModuleManifest | null>(null);
 
     // Bookmark State
     const [isAddingBookmark, setIsAddingBookmark] = useState(false);
@@ -200,7 +198,8 @@ export default function SettingsPage() {
                             } else if (servers.length === 1) {
                                 // Auto-select the only server
                                 const srv = servers[0];
-                                setSettings((prev: any) => {
+                                setSettings((prev) => {
+                                    if (!prev) return prev;
                                     const next = {
                                         ...prev,
                                         plex: {
@@ -319,11 +318,13 @@ export default function SettingsPage() {
     }, []);
 
     const handleInputChange = (section: string, field: string, value: string) => {
-        setSettings((prev: any) => {
+        setSettings((prev) => {
+            if (!prev) return prev;
+            const sectionData = (prev as any)[section] || {};
             const next = {
                 ...prev,
                 [section]: {
-                    ...prev[section],
+                    ...sectionData,
                     [field]: value
                 }
             };
@@ -337,42 +338,52 @@ export default function SettingsPage() {
         });
     };
 
-    const handleAppearanceChange = (field: string, value: any) => {
-        setSettings((prev: any) => ({
-            ...prev,
-            appearance: {
-                ...(prev.appearance || { theme: 'system', accentColor: 'blue', showHeaderStats: false }),
-                [field]: value
-            }
-        }));
+    const handleAppearanceChange = (field: string, value: unknown) => {
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                appearance: {
+                    ...(prev.appearance || { theme: 'system', accentColor: 'blue', showHeaderStats: false }),
+                    [field]: value
+                }
+            };
+        });
     };
 
     const handleResetAppearance = () => {
-        setSettings((prev: any) => ({
-            ...prev,
-            appearance: {
-                theme: 'dark',
-                accentColor: 'var(--md-sys-color-primary)',
-                backgroundColor: 'var(--md-sys-color-surface-container-lowest)',
-                backgroundImage: '',
-                dayStart: 7,
-                nightStart: 19
-            }
-        }));
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                appearance: {
+                    theme: 'dark',
+                    accentColor: 'var(--md-sys-color-primary)',
+                    backgroundColor: 'var(--md-sys-color-surface-container-lowest)',
+                    backgroundImage: '',
+                    dayStart: 7,
+                    nightStart: 19
+                }
+            };
+        });
         setToast({ message: 'Appearance reset to defaults! Click Save to confirm.', type: 'success' });
     };
 
     const updateNavItem = (id: string, field: 'visible' | 'isIframe', value: boolean) => {
-        setSettings((prev: any) => ({
-            ...prev,
-            navigation: prev.navigation.map((item: NavItem) => 
-                item.id === id ? { ...item, [field]: value } : item
-            )
-        }));
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                navigation: prev.navigation.map((item: NavItem) => 
+                    item.id === id ? { ...item, [field]: value } : item
+                )
+            };
+        });
     };
 
     const moveNavItem = (id: string, direction: 'up' | 'down') => {
-        setSettings((prev: any) => {
+        setSettings((prev) => {
+            if (!prev) return prev;
             const nav = [...prev.navigation];
             const index = nav.findIndex(i => i.id === id);
             if (index === -1) return prev;
@@ -388,12 +399,15 @@ export default function SettingsPage() {
     };
 
     const handleIconChange = (id: string, newIcon: string) => {
-        setSettings((prev: any) => ({
-            ...prev,
-            navigation: prev.navigation.map((item: NavItem) => 
-                item.id === id ? { ...item, icon: newIcon } : item
-            )
-        }));
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                navigation: prev.navigation.map((item: NavItem) => 
+                    item.id === id ? { ...item, icon: newIcon } : item
+                )
+            };
+        });
     };
 
     const saveNavItem = () => {
@@ -402,7 +416,8 @@ export default function SettingsPage() {
             return;
         }
 
-        setSettings((prev: any) => {
+        setSettings((prev) => {
+            if (!prev) return prev;
             const isEditing = !!newItem.id;
             let newNav;
             
@@ -433,15 +448,18 @@ export default function SettingsPage() {
             setToast({ message: 'System items cannot be deleted, only hidden.', type: 'error' });
             return;
         }
-        setSettings((prev: any) => ({
-            ...prev,
-            navigation: prev.navigation.filter((item: NavItem) => item.id !== id)
-        }));
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                navigation: prev.navigation.filter((item: NavItem) => item.id !== id)
+            };
+        });
     };
 
-    const handleSave = async (explicitSettings?: any) => {
+    const handleSave = async (explicitSettings?: AppSettings) => {
         // Defensive check: if the first argument is a React Event, ignore it
-        let settingsToSave = (explicitSettings && !explicitSettings.nativeEvent) ? explicitSettings : settings;
+        const settingsToSave = (explicitSettings && !(explicitSettings as any).nativeEvent) ? explicitSettings : settings;
         
         if (!settingsToSave) {
             setToast({ message: 'Engine still initializing. Please wait.', type: 'error' });
@@ -476,23 +494,26 @@ export default function SettingsPage() {
     };
 
     const removeBookmark = (id: string) => {
-        setSettings((prev: any) => ({
-            ...prev,
-            bookmarks: (prev.bookmarks || []).filter((b: any) => b.id !== id),
-            dashboard: {
-                ...prev.dashboard,
-                rows: (prev.dashboard?.rows || []).map((row: any) => ({
-                    ...row,
-                    sections: (row.sections || []).map((section: any) => ({
-                        ...section,
-                        layout: (section.layout || []).filter((item: any) => {
-                            const itemId = typeof item === 'string' ? item : item.i;
-                            return itemId !== `bookmark-${id}`;
-                        })
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                bookmarks: (prev.bookmarks || []).filter((b: Bookmark) => b.id !== id),
+                dashboard: {
+                    ...prev.dashboard,
+                    rows: (prev.dashboard?.rows || []).map((row: DashboardRow) => ({
+                        ...row,
+                        sections: (row.sections || []).map((section: DashboardSection) => ({
+                            ...section,
+                            layout: (section.layout || []).filter((item: DashboardLayoutItem) => {
+                                const itemId = typeof item === 'string' ? item : item.i;
+                                return itemId !== `bookmark-${id}`;
+                            })
+                        }))
                     }))
-                }))
-            }
-        }));
+                }
+            };
+        });
     };
 
     const handlePlexTest = async () => {
@@ -511,7 +532,7 @@ export default function SettingsPage() {
         }
     };
 
-    const handleSelectServer = async (srv: any) => {
+    const handleSelectServer = async (srv: { token: string, url: string, name: string, machineId: string }) => {
         const next = {
             ...settings,
             plex: {
@@ -537,10 +558,13 @@ export default function SettingsPage() {
         }
 
         const id = `bm-${Date.now()}`;
-        setSettings((prev: any) => ({
-            ...prev,
-            bookmarks: [...(prev.bookmarks || []), { ...newBookmark, id }],
-        }));
+        setSettings((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                bookmarks: [...(prev.bookmarks || []), { ...newBookmark, id }],
+            };
+        });
 
         setNewBookmark({ name: '', url: '', icon: 'Globe', color: '#64B5F6' });
         setIsAddingBookmark(false);
@@ -865,7 +889,7 @@ export default function SettingsPage() {
                             ).length === 0 && (
                                 <div style={{ textAlign: 'center', padding: '60px 0', opacity: 0.3 }}>
                                     <Search size={48} style={{ marginBottom: '16px' }} />
-                                    <div>No matching settings found for "{settingsSearch}"</div>
+                                    <div>No matching settings found for &quot;{settingsSearch}&quot;</div>
                                 </div>
                             )}
                         </div>

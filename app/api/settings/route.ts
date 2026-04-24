@@ -4,11 +4,11 @@ import { NextResponse } from 'next/server';
 /**
  * Recursively removes dangerous prototype pollution keys.
  */
-function sanitizeObject(val: any): any {
+function sanitizeObject(val: unknown): unknown {
     if (val === null || typeof val !== 'object') return val;
     if (Array.isArray(val)) return val.map(sanitizeObject);
 
-    const sanitized = { ...val };
+    const sanitized = { ...(val as Record<string, unknown>) };
     delete sanitized['__proto__'];
     delete sanitized['constructor'];
     delete sanitized['prototype'];
@@ -27,7 +27,7 @@ export async function GET() {
         const safeSettings = JSON.parse(JSON.stringify(settings));
 
         // Mask secrets
-        for (const [key, moduleData] of Object.entries(safeSettings)) {
+        for (const [_, moduleData] of Object.entries(safeSettings)) {
             if (!moduleData || Array.isArray(moduleData) || typeof moduleData !== 'object') continue;
 
             for (const [credential, val] of Object.entries(moduleData)) {
@@ -38,12 +38,12 @@ export async function GET() {
                     credential.toLowerCase().includes('key') || 
                     /apikey/i.test(credential)
                 )) {
-                    (moduleData as any)[credential] = '********';
+                    (moduleData as Record<string, string>)[credential] = '********';
                 }
             }
         }
         return NextResponse.json({ settings: safeSettings });
-    } catch (e: any) {
+    } catch (e) {
         console.error('[Settings API GET ERROR]:', e);
         // Sanitize error message to avoid infrastructure leaks
         return NextResponse.json({ error: 'Failed to load settings' }, { status: 500 });
@@ -51,7 +51,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    let payload: any = null;
+    let payload: { settings?: unknown } | null = null;
     try {
         payload = await request.json();
         if (!payload || !payload.settings || typeof payload.settings !== 'object' || Array.isArray(payload.settings)) {
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
             // 1. Handle root arrays (navigation, bookmarks) - Use sanitizeObject for array content
             if (Array.isArray(moduleData)) {
-                (current as any)[moduleKey] = sanitizeObject(moduleData);
+                (current as Record<string, unknown>)[moduleKey] = sanitizeObject(moduleData);
                 continue;
             }
 
@@ -75,9 +75,9 @@ export async function POST(request: Request) {
             if (!moduleData || typeof moduleData !== 'object') continue;
 
             // 3. Ensure target module exists as an object
-            const existingModule = (current as any)[moduleKey];
+            const existingModule = (current as Record<string, unknown>)[moduleKey];
             if (!existingModule || typeof existingModule !== 'object' || Array.isArray(existingModule)) {
-                (current as any)[moduleKey] = {};
+                (current as Record<string, unknown>)[moduleKey] = {};
             }
 
             // 4. Update fields
@@ -86,25 +86,25 @@ export async function POST(request: Request) {
 
                 // Safety: If target is an array but update is an object (not array), skip or handle
                 // to prevent data corruption.
-                if (Array.isArray((current as any)[moduleKey][field]) && val !== null && typeof val === 'object' && !Array.isArray(val)) {
+                if (Array.isArray((current as Record<string, Record<string, unknown>>)[moduleKey][field]) && val !== null && typeof val === 'object' && !Array.isArray(val)) {
                     console.warn(`[Settings API]: Attempted to merge object onto array for ${moduleKey}.${field}. Skipping.`);
                     continue;
                 }
 
                 // Arrays are overwritten, not merged deep - Sanitize array content
                 if (Array.isArray(val)) {
-                    (current as any)[moduleKey][field] = sanitizeObject(val);
+                    (current as Record<string, Record<string, unknown>>)[moduleKey][field] = sanitizeObject(val);
                 } 
                 // Only update if it's not the masked string
                 else if (val !== '********') {
-                    (current as any)[moduleKey][field] = sanitizeObject(val);
+                    (current as Record<string, Record<string, unknown>>)[moduleKey][field] = sanitizeObject(val);
                 }
             }
         }
 
         saveSettings(current);
         return NextResponse.json({ success: true });
-    } catch (e: any) {
+    } catch (e) {
         console.error('[Settings API POST ERROR]:', e);
         return NextResponse.json({ 
             error: 'Unknown server error'
