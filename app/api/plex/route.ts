@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getPlexConnection, cachedPlexFetch } from '@/lib/plex';
 
+export const dynamic = 'force-dynamic';
+
 interface PlexDirectory {
     key: string;
     title: string;

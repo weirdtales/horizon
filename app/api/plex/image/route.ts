@@ -1,5 +1,7 @@
 import { getPlexConnection } from '@/lib/plex';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -61,15 +63,15 @@ export async function GET(request: Request) {
             return new Response(blob, {
                 headers: responseHeaders
             });
-        } catch (fetchErr: any) {
+        } catch (fetchErr: unknown) {
             clearTimeout(timeoutId);
-            if (fetchErr.name === 'AbortError') {
+            if ((fetchErr as Error).name === 'AbortError') {
                 return new Response('Plex image fetch timed out', { status: 504 });
             }
             throw fetchErr;
         }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Plex Image Proxy Error:', err);
         return new Response('Internal Server Error', { status: 500 });
     }

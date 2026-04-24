@@ -1,5 +1,4 @@
 import { getSettings, saveSettings } from './settings';
-import { Agent } from 'undici';
 
 // Cache structure
 interface PlexCache {
@@ -24,12 +23,25 @@ interface PlexResource {
 const plexGlobalCache: Record<string, PlexCache> = {};
 const CACHE_TTL = 60 * 1000; // 60 seconds
 
-// Custom HTTPS agents for TLS control (Compatible with native fetch/undici)
-const insecureAgent = new Agent({ 
-    keepAliveTimeout: 10 * 1000, 
-    keepAliveMaxTimeout: 10 * 1000,
-    connect: { rejectUnauthorized: false } 
-});
+// Lazy-loaded insecure agent to prevent build-time crashes with undici/Next.js
+let _insecureAgent: unknown = null;
+
+async function getInsecureAgent() {
+    if (!_insecureAgent) {
+        try {
+            const { Agent } = await import('undici');
+            _insecureAgent = new Agent({ 
+                keepAliveTimeout: 10 * 1000, 
+                keepAliveMaxTimeout: 10 * 1000,
+                connect: { rejectUnauthorized: false } 
+            });
+        } catch (err) {
+            console.error('Failed to initialize insecure undici Agent:', err);
+            return undefined;
+        }
+    }
+    return _insecureAgent;
+}
 
 // Track warned URLs to prevent log spam
 const warnedUrls = new Set<string>();
@@ -88,7 +100,7 @@ export async function getPlexConnection() {
                 cache: 'no-store',
                 signal: controller.signal,
                 // @ts-expect-error - Only use custom dispatcher if explicitly allowed insecure
-                dispatcher: allowInsecure ? insecureAgent : undefined
+                dispatcher: allowInsecure ? await getInsecureAgent() : undefined
             });
             clearTimeout(timeoutId);
             if (!res.ok) return null;
@@ -146,7 +158,7 @@ export async function getPlexConnection() {
                     }
                 }
             }
-        } catch (err) {
+        } catch (err: unknown) {
             clearTimeout(discTimeout);
             console.error('Plex Discovery Error:', err);
         }
@@ -194,8 +206,8 @@ export async function cachedPlexFetch(url: string, headers: Record<string, strin
             headers, 
             cache: 'no-store',
             signal: controller.signal,
-            // @ts-expect-error
-            dispatcher: allowInsecure ? insecureAgent : undefined
+            // @ts-expect-error - Custom dispatcher is valid in undici-based fetch
+            dispatcher: allowInsecure ? await getInsecureAgent() : undefined
         });
         
         if (!res.ok) throw new Error(`Plex Error: ${res.status}`);

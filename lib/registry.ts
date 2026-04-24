@@ -1,5 +1,4 @@
 import dynamic from 'next/dynamic';
-import React from 'react';
 
 import adguardManifest from '@/modules/adguard/module.json';
 import cloudflareManifest from '@/modules/cloudflare/module.json';
