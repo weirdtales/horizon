@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState, Fragment } from 'react';
 import {
-    Save, Globe, Cloud, Wifi, 
+    Save, Globe, 
     Trash, Activity, RefreshCw, RefreshCcw, Link as LinkIcon, Eye, EyeOff,
     Download, Upload, Database, Server,
     PlaySquare, Pencil,
     ChevronUp, ChevronDown, Plus, ExternalLink,
     Palette, Monitor, Sun, Moon, Clock, ArrowLeft, Search, Mic, Check,
     Layers, Info, ChevronRight,
-    Zap, Loader2, ArrowRightLeft, Settings as SettingsIcon,
+    Zap, Loader2, Settings as SettingsIcon,
 } from 'lucide-react';
 
 
@@ -20,9 +20,8 @@ import { NavItem, AppSettings, ModuleManifest, Bookmark, DashboardRow, Dashboard
 import { BackButton } from '../components/BackButton';
 import { DashboardIcon, COMMON_ICONS } from '../components/DashboardIcon';
 import { MD3Toast, ToastType } from '../components/MD3Toast';
-import { sanitizeUrl, sanitizeText } from '@/lib/url';
 import changelogData from '@/lib/changelog.json';
-import { MODULE_MANIFESTS, MODULE_VIEWS } from '@/lib/registry';
+import { MODULE_MANIFESTS } from '@/lib/registry';
 import { ModuleSettingsDialog } from '../components/ModuleSettingsDialog';
 
 // Mapping of IDs to categories for consistent grouping
@@ -97,8 +96,8 @@ export default function SettingsPage() {
             let data: { message?: string; error?: string } = {};
             try {
                 data = await res.json();
-            } catch (_e) {
-                console.error('[Upload Parse Error]:', _e);
+            } catch {
+                console.error('[Upload Parse Error]');
             }
 
             if (res.ok) {
@@ -108,7 +107,7 @@ export default function SettingsPage() {
             } else {
                 setToast({ message: data.error || `Upload failed (Status: ${res.status})`, type: 'error' });
             }
-        } catch (_err) {
+        } catch {
             setToast({ message: 'Network error during plugin installation.', type: 'error' });
         } finally {
             setUploading(false);
@@ -129,10 +128,10 @@ export default function SettingsPage() {
                 let data: { error?: string } = {};
                 try {
                     data = await res.json();
-                } catch (_e) {}
+                } catch {}
                 setToast({ message: data.error || `Failed to uninstall plugin (Status: ${res.status}).`, type: 'error' });
             }
-        } catch (_err) {
+        } catch {
             setToast({ message: 'Network error during uninstallation.', type: 'error' });
         }
     };
@@ -222,20 +221,20 @@ export default function SettingsPage() {
                                 setDiscoveredServers(servers.map((s: { id: string; name: string; url: string; machineId: string; token: string }) => ({ ...s, token: data.authToken })));
                                 setPlexAuthStatus('discovery');
                             }
-                        } catch (err) {
+                        } catch {
                             setToast({ message: 'Discovery failed. Please enter URL manually.', type: 'error' });
                             setPlexAuthStatus('error');
                         }
 
                         setTimeout(() => setPlexAuth(null), 3000);
                     }
-                } catch (err) {
+                } catch {
                     console.error('Plex Poll Error:', err);
                 }
             }, 3000);
         }
         return () => clearInterval(pollInterval);
-    }, [plexPolling, plexAuth?.id]);
+    }, [plexPolling, plexAuth?.id, handleSave]);
 
     const handlePlexSignIn = async () => {
         if (hasChanges) {
@@ -266,7 +265,7 @@ export default function SettingsPage() {
             } else {
                 throw new Error('No PIN received');
             }
-        } catch (err) {
+        } catch {
             setToast({ message: 'Failed to start Plex Link process.', type: 'error' });
             setPlexAuthStatus('idle');
         }
@@ -279,7 +278,6 @@ export default function SettingsPage() {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const [currentTheme, setCurrentTheme] = useState('dark');
     useEffect(() => {
         if (settings?.appearance?.theme) {
             if (settings.appearance.theme === 'time') {
@@ -399,17 +397,6 @@ export default function SettingsPage() {
         });
     };
 
-    const handleIconChange = (id: string, newIcon: string) => {
-        setSettings((prev) => {
-            if (!prev) return prev;
-            return {
-                ...prev,
-                navigation: prev.navigation.map((item: NavItem) => 
-                    item.id === id ? { ...item, icon: newIcon } : item
-                )
-            };
-        });
-    };
 
     const saveNavItem = () => {
         if (!newItem.label || !newItem.path) {
@@ -528,7 +515,7 @@ export default function SettingsPage() {
             } else {
                 setToast({ message: `Plex Error: ${apiData.error} - ${apiData.details}`, type: 'error' });
             }
-        } catch (err) {
+        } catch {
             setToast({ message: 'Could not reach proxy API. Ensure your URL is correct.', type: 'error' });
         }
     };
@@ -598,7 +585,7 @@ export default function SettingsPage() {
                 } else {
                     throw new Error('Invalid format');
                 }
-            } catch (err) {
+            } catch {
                 setToast({ message: 'Failed to read backup file. Ensure it is a valid JSON settings file.', type: 'error' });
             }
         };
@@ -672,7 +659,6 @@ export default function SettingsPage() {
         );
     }
 
-    const categories = Array.from(new Set(SETTINGS_MAP.map(s => s.category)));
     const hasChanges = JSON.stringify(settings) !== JSON.stringify(initialSettings);
     
 
@@ -873,7 +859,7 @@ export default function SettingsPage() {
                                                 <input
                                                     type={field.type}
                                                     placeholder={field.placeholder}
-                                                    value={settings?.[service.id]?.[field.key] || ''}
+                                                    value={(settings?.[service.id] as Record<string, string>)?.[field.key] || ''}
                                                     onChange={e => handleInputChange(service.id, field.key, e.target.value)}
                                                     style={{ backgroundColor: 'var(--md-sys-color-surface-container-highest)', border: '1px solid var(--md-sys-color-outline-variant)', borderRadius: 'var(--md-sys-shape-corner-medium)', padding: '12px 16px', color: 'var(--md-sys-color-on-surface)', fontSize: '14px', outline: 'none' }}
                                                 />
@@ -1424,7 +1410,7 @@ export default function SettingsPage() {
 
                                     {(isChangelogExpanded ? (changelogData || []).slice(0, 5) : (changelogData || []).slice(0, 1))
                                         .filter(Boolean)
-                                        .map((release: { version: string; date: string; changes: string[] }, idx: number) => (
+                                        .map((release: { version: string; title: string; date: string; changes: string[] }, idx: number) => (
                                             <div key={release.version} style={{ 
                                                 padding: '24px', 
                                                 backgroundColor: idx === 0 ? 'var(--md-sys-color-surface-container-highest)' : 'rgba(255,255,255,0.02)', 
@@ -1617,9 +1603,9 @@ export default function SettingsPage() {
                                                 setNewItem({
                                                     ...newItem,
                                                     label: service.name,
-                                                    path: isModularView ? `/view/${service.id}` : (settings[service.id]?.url || `/${service.id}`),
+                                                    path: isModularView ? `/view/${service.id}` : ((settings[service.id] as Record<string, string>)?.url || `/${service.id}`),
                                                     icon: service.icon,
-                                                    isIframe: !isActuallyNative && (['proxmox'].includes(service.id) || !!settings[service.id]?.url)
+                                                    isIframe: !isActuallyNative && (['proxmox'].includes(service.id) || !!(settings[service.id] as Record<string, string>)?.url)
                                                 });
                                             }}
                                             className="m3-press-effect"
@@ -1720,16 +1706,22 @@ export default function SettingsPage() {
                                         setNewItem({ ...newItem, icon });
                                     } else if (editingIconId.startsWith('bm-')) {
                                         // It's a bookmark (this part of the code might be elsewhere but for safety)
-                                        setSettings((prev: AppSettings) => ({
-                                            ...prev,
-                                            bookmarks: prev.bookmarks.map((b: Bookmark) => b.id === editingIconId ? { ...b, icon } : b)
-                                        }));
+                                        setSettings((prev) => {
+                                            if (!prev) return prev;
+                                            return {
+                                                ...prev,
+                                                bookmarks: prev.bookmarks.map((b: Bookmark) => b.id === editingIconId ? { ...b, icon } : b)
+                                            };
+                                        });
                                     } else {
                                         // It's a navigation item
-                                        setSettings((prev: AppSettings) => ({
-                                            ...prev,
-                                            navigation: prev.navigation.map((n: NavItem) => n.id === editingIconId ? { ...n, icon } : n)
-                                        }));
+                                        setSettings((prev) => {
+                                            if (!prev) return prev;
+                                            return {
+                                                ...prev,
+                                                navigation: prev.navigation.map((n: NavItem) => n.id === editingIconId ? { ...n, icon } : n)
+                                            };
+                                        });
                                     }
                                     setEditingIconId(null);
                                 }}

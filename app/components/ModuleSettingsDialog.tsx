@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { X, Save, Info, Loader2, AlertCircle } from 'lucide-react';
 import { DashboardIcon } from './DashboardIcon';
-import { ModuleManifest, ModuleField as Field } from '@/lib/types';
+import { ModuleManifest } from '@/lib/types';
 
 interface ModuleSettingsDialogProps {
     module: ModuleManifest;
-    initialSettings: any;
-    onSave: (newSettings: any) => Promise<void>;
+    initialSettings: Record<string, unknown>;
+    onSave: (newSettings: Record<string, unknown>) => Promise<void>;
     onClose: () => void;
     extraActions?: React.ReactNode;
 }
@@ -32,9 +32,9 @@ export function ModuleSettingsDialog({ module, initialSettings, onSave, onClose,
         try {
             await onSave(settings);
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to save module settings:', err);
-            setError(err.message || String(err) || 'Failed to save settings');
+            setError((err as Error).message || String(err) || 'Failed to save settings');
         } finally {
             setSaving(false);
         }

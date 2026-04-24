@@ -43,7 +43,7 @@ export const MODULE_MANIFESTS = [
     workspaceManifest,
 ];
 
-export const MODULE_WIDGETS: Record<string, any> = {
+export const MODULE_WIDGETS: Record<string, unknown> = {
     'adguard': dynamic(() => import('@/modules/adguard/widget')),
     'cloudflare': dynamic(() => import('@/modules/cloudflare/widget')),
     'dockge': dynamic(() => import('@/modules/dockge/widget')),
@@ -65,7 +65,7 @@ export const MODULE_WIDGETS: Record<string, any> = {
     'workspace': dynamic(() => import('@/modules/workspace/widget')),
 };
 
-export const MODULE_VIEWS: Record<string, any> = {
+export const MODULE_VIEWS: Record<string, unknown> = {
     'cloudflare': dynamic(() => import('@/modules/cloudflare/view')),
     'example-hello': dynamic(() => import('@/modules/example-hello/view')),
     'loopia': dynamic(() => import('@/modules/loopia/view')),

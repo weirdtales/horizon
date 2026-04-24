@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
     Globe, Cloud, Film, Wifi, ArrowRight,
     CloudRain, ArrowUpCircle, X, Plus, Save, Box, 
@@ -348,8 +348,8 @@ export default function DashboardHub() {
     }, [editMode]);
 
 
-    const handleResizeStop = useCallback((layout: readonly DashboardLayoutItem[], oldItem: DashboardLayoutItem, newItem: DashboardLayoutItem) => {
-        if (!editMode) return;
+    const handleResizeStop = useCallback((layout: readonly DashboardLayoutItem[], _oldItem: DashboardLayoutItem, newItem: DashboardLayoutItem) => {
+        if (!editMode || typeof newItem === 'string') return;
         setWidgetSizes(prev => ({
             ...prev,
             [newItem.i]: `custom-${newItem.w}-${newItem.h}`
@@ -655,7 +655,7 @@ export default function DashboardHub() {
                                     >
                                         <ResponsiveGridLayout
                                             className="layout"
-                                            layouts={{ lg: section.layout as any, md: section.layout as any, sm: section.layout as any }}
+                                            layouts={{ lg: section.layout as unknown as unknown[], md: section.layout as unknown as unknown[], sm: section.layout as unknown as unknown[] }}
                                             breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                                             cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
                                             rowHeight={120}
@@ -665,8 +665,8 @@ export default function DashboardHub() {
                                             margin={[isMobile ? 16 : 24, isMobile ? 16 : 24]}
                                             containerPadding={[0, 0]}
                                             draggableCancel=".no-drag"
-                                            onLayoutChange={(l) => handleLayoutChange(l, rIdx, sIdx)}
-                                            onResizeStop={handleResizeStop}
+                                            onLayoutChange={(l) => handleLayoutChange(l as unknown as DashboardLayoutItem[], rIdx, sIdx)}
+                                            onResizeStop={(l, o, n) => handleResizeStop(l as unknown as DashboardLayoutItem[], o as unknown as DashboardLayoutItem, n as unknown as DashboardLayoutItem)}
                                         >
                                             {section.layout.map((item: DashboardLayoutItem) => {
                                                 const id = typeof item === 'string' ? item : (item as { i: string }).i;

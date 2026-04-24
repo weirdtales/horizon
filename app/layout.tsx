@@ -8,7 +8,7 @@ import { NavItem } from '@/lib/settings';
 import { DashboardIcon } from './components/DashboardIcon';
 import { Menu, X } from 'lucide-react';
 import { sanitizeUrl } from '@/lib/url';
-import type { ModuleManifest } from '@/lib/registry';
+import type { ModuleManifest } from '@/lib/types';
 
 interface HorizonLogoProps {
     accentColor?: string;
@@ -99,7 +99,7 @@ export default function RootLayout({
                         const existingIds = new Set(data.settings.navigation.map((n: NavItem) => n.id));
                         const combinedNav = [
                             ...data.settings.navigation,
-                            ...modularNavItems.filter((m: any) => !existingIds.has(m.id))
+                            ...modularNavItems.filter((m: NavItem) => !existingIds.has(m.id))
                         ];
                         setNavItems(combinedNav);
                     }
@@ -148,7 +148,7 @@ export default function RootLayout({
                     const embedded = window.self !== window.top;
                     setIsEmbedded(embedded);
                 }
-            } catch (e) {
+            } catch {
                 setIsEmbedded(true);
             }
         };
@@ -205,7 +205,7 @@ export default function RootLayout({
                     finalUrl = parsed.toString();
                 }
             }
-        } catch (e) {
+        } catch {
             finalUrl = isInternal ? targetUrl : '/';
         }
 
