@@ -18,7 +18,7 @@ import { AppSettings } from '@/lib/types';
 
 // Simplified internal hook for the module
 function useWeather(settings: AppSettings['weather']) {
-    const { apiKey, location = 'Stockholm', units = 'metric' } = settings || {};
+    const { apiKey, location = 'London', units = 'metric' } = settings || {};
     const [weatherData, setWeatherData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [hasLocationError, setHasLocationError] = useState(false);
