@@ -1,0 +1,13 @@
+{
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "icon": "Cloud",
+    "color": "#f38020",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": true,
+    "configFields": [
+        { "key": "token", "label": "API Token", "type": "password", "placeholder": "Global or Scoped Token" },
+        { "key": "accountId", "label": "Account ID", "type": "text", "placeholder": "32-char hex string" }
+    ]
+}

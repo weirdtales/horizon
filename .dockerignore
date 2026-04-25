@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+README.md
+data/*.json
+# package-lock.json should NOT be ignored for npm ci
+npm-debug.log
+data/settings.json

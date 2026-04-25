@@ -1,0 +1,13 @@
+{
+    "id": "loopia",
+    "name": "Loopia DNS",
+    "icon": "Globe",
+    "color": "#3498db",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": true,
+    "configFields": [
+        { "key": "user", "label": "API Username", "type": "text", "placeholder": "user@example.com" },
+        { "key": "password", "label": "API Password", "type": "password", "placeholder": "••••••••" }
+    ]
+}

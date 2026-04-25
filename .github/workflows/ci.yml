@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - main
+      - develop
+  pull_request:
+    branches: 
+      - main
+      - develop
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [24.x]
+
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint check
+      run: npm run lint
+      continue-on-error: true
+      
+    - name: Build
+      run: npm run build
+      env:
+        NEXT_PUBLIC_BASE_URL: http://localhost:3000
+        UPLOAD_API_KEY: ci_test
+        MODULE_API_KEY: ci_test
+        NEXT_TELEMETRY_DISABLED: 1

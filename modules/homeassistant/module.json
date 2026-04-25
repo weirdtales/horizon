@@ -1,0 +1,23 @@
+{
+    "id": "homeassistant",
+    "name": "Home Assistant",
+    "icon": "Home",
+    "color": "#03a9f4",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://homeassistant.local:8123"
+        },
+        {
+            "key": "token",
+            "label": "Long-lived Access Token",
+            "type": "password",
+            "placeholder": "Generate in profile"
+        }
+    ]
+}

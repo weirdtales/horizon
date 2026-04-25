@@ -1,0 +1,14 @@
+{
+    "id": "workspace",
+    "name": "Google Workspace",
+    "icon": "Mail",
+    "color": "#4285f4",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        { "key": "email", "label": "Gmail Address", "type": "text" },
+        { "key": "clientId", "label": "Google Client ID", "type": "text" },
+        { "key": "clientSecret", "label": "Google Client Secret", "type": "password" }
+    ]
+}

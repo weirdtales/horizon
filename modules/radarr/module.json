@@ -1,0 +1,24 @@
+{
+    "id": "radarr",
+    "name": "Radarr",
+    "description": "Premium Movie management and monitoring.",
+    "icon": "Film",
+    "color": "#ffc107",
+    "version": "1.0.0",
+    "author": "Horizon Team",
+    "hasWidget": true,
+    "hasView": true,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Radarr URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:7878"
+        },
+        {
+            "key": "apiKey",
+            "label": "API Key",
+            "type": "password"
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "id": "pihole",
+    "name": "Pi-hole",
+    "icon": "ShieldCheck",
+    "color": "#f87171",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.6/admin"
+        },
+        {
+            "key": "password",
+            "label": "Web Password",
+            "type": "password",
+            "placeholder": "••••••••"
+        }
+    ]
+}

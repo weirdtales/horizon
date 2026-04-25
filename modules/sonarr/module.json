@@ -1,0 +1,26 @@
+{
+    "id": "sonarr",
+    "name": "Sonarr",
+    "description": "Premium TV Series management and monitoring.",
+    "icon": "Video",
+    "color": "#3c9bdc",
+    "version": "1.0.0",
+    "author": "Horizon Team",
+    "hasWidget": true,
+    "hasView": true,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Sonarr URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:8989",
+            "helpText": "The internal or external URL of your Sonarr instance."
+        },
+        {
+            "key": "apiKey",
+            "label": "API Key",
+            "type": "password",
+            "helpText": "Found in Sonarr > Settings > General."
+        }
+    ]
+}
