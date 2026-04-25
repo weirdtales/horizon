@@ -95,12 +95,11 @@ export async function GET() {
             libraries: detailedLibraries,
         });
     } catch (err) {
-        const message = err instanceof Error ? err.message : 'Connection Failed';
         console.error('Plex connection API error:', err);
         return NextResponse.json(
             {
                 status: 'offline',
-                error: message,
+                error: 'Connection Failed',
             },
             { status: 500 }
         );
