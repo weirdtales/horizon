@@ -1,0 +1,15 @@
+{
+    "id": "proxmox",
+    "name": "Proxmox VE",
+    "icon": "Server",
+    "color": "#e67e22",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        { "key": "url", "label": "Node URL", "type": "url", "placeholder": "https://192.168.1.100:8006" },
+        { "key": "user", "label": "Username", "type": "text", "placeholder": "root@pam" },
+        { "key": "tokenName", "label": "Token Name", "type": "text", "placeholder": "horizon" },
+        { "key": "tokenSecret", "label": "Token Secret", "type": "password", "placeholder": "uuid-string" }
+    ]
+}

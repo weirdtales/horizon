@@ -1,0 +1,17 @@
+{
+    "id": "glances",
+    "name": "Glances",
+    "icon": "BarChart",
+    "color": "#34d399",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "API URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:61208/api/3"
+        }
+    ]
+}

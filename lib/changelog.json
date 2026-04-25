@@ -1,0 +1,71 @@
+[
+    {
+        "version": "1.4.0",
+        "date": "2026-04-23",
+        "title": "Modular Hardening & Navigation Freedom",
+        "changes": [
+            "UI Standardization: Unified the top bar across all service views (Dockge, Glances, Uptime Kuma, Home Assistant, and Media Engine) with a premium 64px header and consistent typography.",
+            "Navigation Reordering: Implemented manual reordering for sidebar links with Up/Down controls in Settings, giving users full control over their navigation hierarchy.",
+            "Header Consistency: Standardized titles (15px bold) and subtitles (11px semi-transparent) across the entire application to ensure a cohesive, professional UX.",
+            "Modular Visibility Hardening: Enforced strict opt-in registration for native modules and implemented hidden manifest flags for internal development components.",
+            "Iframe Guard System: Enhanced the layout engine to correctly identify and render native pages (including Media Engine) without redundant iframe wrappers.",
+            "Refined Interaction: Finalized the icon-only 'Back' button standard across all service pages, eliminating residual text labels for a cleaner interface."
+        ]
+    },
+    {
+        "version": "1.3.0",
+        "date": "2026-04-23",
+        "title": "Open Source Release & Security Hardening",
+        "changes": [
+            "Official Open Source release with MIT License and public documentation.",
+            "Resolved critical Next.js ChunkLoadError by stabilizing the Turbopack build pipeline.",
+            "Comprehensive TypeScript hardening: Fixed manifest property mismatches and AppSettings type integrity.",
+            "Comprehensive security hardening for API routes including Host header validation.",
+            "Unified Plex TLS handling with support for user-defined certificate validation preferences.",
+            "Implemented request cancellation (AbortController) to prevent memory leaks and race conditions.",
+            "Added 'hasChanges' confirmation prompts to settings to prevent accidental data loss.",
+            "Enhanced Module Settings dialog with ARIA accessibility roles and keyboard navigation.",
+            "Added dynamic geocoding for keyless Open-Meteo weather integration.",
+            "Optimized global CSS system with unified elevation levels and pulse animations.",
+            "Refined Radarr/Sonarr views with robust defensive coding for numeric edge cases."
+        ]
+    },
+    {
+        "version": "1.2.0",
+        "date": "2026-04-22",
+        "title": "Modernized Plex Discovery & UI Refinement",
+        "changes": [
+            "Overhauled Plex server name fetching logic to prioritize user-defined 'friendlyName' over machine GUIDs.",
+            "Refactored Weather Widget with dynamic contrast engine for perfect legibility in Light Mode.",
+            "Synchronized global design system with MD3 semantic tokens, eliminating legacy 'dark-mode islands'.",
+            "Added centralized 'About & System' section in settings with release notes and changelog history.",
+            "Implemented strict XSS sanitization for dynamic text labels while allowing human-readable titles.",
+            "Optimized Plex terminal page with high-contrast status chips and infrastructure branding.",
+            "Streamlined widget headers by removing redundant status labels for a more premium look."
+        ]
+    },
+    {
+        "version": "1.1.0",
+        "date": "2026-04-18",
+        "title": "Material 3 Stability & Glassmorphism",
+        "changes": [
+            "Implemented Material Design 3 (MD3) surface color system across all dashboard widgets.",
+            "Introduced 'Glass' theme variant with theme-aware frosted opacities.",
+            "Added Plex SSO (OAuth) support for secure, one-click server discovery.",
+            "Improved dashboard grid stability and mobile layout responsiveness.",
+            "Enhanced sidebar navigation with searchable service gallery and custom icons."
+        ]
+    },
+    {
+        "version": "1.0.0",
+        "date": "2026-04-15",
+        "title": "Initial Launch: Horizon Core",
+        "changes": [
+            "Initial release of the Horizon Personal Dashboard.",
+            "Support for Loopia DNS, Cloudflare, Plex, Immich, and Home Assistant monitoring.",
+            "Customizable grid layout with drag-and-drop support.",
+            "Global search functionality for settings and navigation.",
+            "Dark and Light mode support with system theme syncing."
+        ]
+    }
+]

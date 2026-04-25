@@ -1,0 +1,29 @@
+{
+    "id": "uptimekuma",
+    "name": "Uptime Kuma",
+    "icon": "Activity",
+    "color": "#6ad3cb",
+    "version": "1.0.0",
+    "hasWidget": true,
+    "hasView": false,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Instance URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:3001"
+        },
+        {
+            "key": "user",
+            "label": "Username",
+            "type": "text",
+            "placeholder": "admin"
+        },
+        {
+            "key": "password",
+            "label": "Password",
+            "type": "password",
+            "placeholder": "••••••••"
+        }
+    ]
+}

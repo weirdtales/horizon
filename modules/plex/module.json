@@ -1,0 +1,25 @@
+{
+    "id": "plex",
+    "name": "Plex",
+    "description": "Premium Media Center with real-time stream monitoring.",
+    "icon": "PlaySquare",
+    "color": "#eab308",
+    "version": "1.0.0",
+    "author": "Horizon Team",
+    "hasWidget": true,
+    "hasView": true,
+    "configFields": [
+        {
+            "key": "url",
+            "label": "Plex Server URL",
+            "type": "url",
+            "placeholder": "http://192.168.1.10:32400"
+        },
+        {
+            "key": "token",
+            "label": "Plex Token",
+            "type": "password",
+            "helpText": "Your X-Plex-Token."
+        }
+    ]
+}
