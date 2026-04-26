@@ -17,16 +17,16 @@ Plan pointer: `.assistant/plan.md`
 
 ## Risks
 
-| Risk | Likelihood | Mitigation |
-| --- | --- | --- |
-| Roadmap still implies users need real homelab credentials before Horizon is useful | High | Prioritize P-002, P-009, and P-010 |
-| Module upload/delete UI cannot work because routes require bearer auth but the browser calls do not send it | Medium | Resolve P-003 before promoting plugin upload as usable |
-| Type definitions drift from persisted settings and manifests | Medium | Resolve P-004 before adding more modules |
-| Widgets can look fake if sample data is scattered or unlabeled | Medium | Use shared sample data and visible demo-mode states |
-| Custom module creation can become unsafe if the UI writes arbitrary paths or code | Medium | Gate P-012 behind strict id/path validation and starter templates |
-| Module settings can become confusing if sample mode and connector credentials are mixed together | Medium | Separate display/layout, sample mode, and connector settings in P-011 |
-| Future real connector routes may leak raw upstream behavior or hang on slow services | Medium | Resolve P-006 with timeout and sanitized error patterns |
-| `.docs/` was deleted while `.assistant/canvas/` is untracked | Medium | Commit normalized `.assistant/` migration intentionally |
+| Risk                                                                                                        | Likelihood | Mitigation                                                            |
+| ----------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------- |
+| Roadmap still implies users need real homelab credentials before Horizon is useful                          | High       | Prioritize P-002, P-009, and P-010                                    |
+| Module upload/delete UI cannot work because routes require bearer auth but the browser calls do not send it | Medium     | Resolve P-003 before promoting plugin upload as usable                |
+| Type definitions drift from persisted settings and manifests                                                | Medium     | Resolve P-004 before adding more modules                              |
+| Widgets can look fake if sample data is scattered or unlabeled                                              | Medium     | Use shared sample data and visible demo-mode states                   |
+| Custom module creation can become unsafe if the UI writes arbitrary paths or code                           | Medium     | Gate P-012 behind strict id/path validation and starter templates     |
+| Module settings can become confusing if sample mode and connector credentials are mixed together            | Medium     | Separate display/layout, sample mode, and connector settings in P-011 |
+| Future real connector routes may leak raw upstream behavior or hang on slow services                        | Medium     | Resolve P-006 with timeout and sanitized error patterns               |
+| `.docs/` was deleted while `.assistant/canvas/` is untracked                                                | Medium     | Commit normalized `.assistant/` migration intentionally               |
 
 ## Artifacts
 
@@ -45,18 +45,21 @@ Plan pointer: `.assistant/plan.md`
 - History: `.assistant/history.md`
 - ADRs: `.assistant/adr/`
 - First session plan: `.assistant/first-session-plan.md`
+- Shared sample mode badge: `components/ModuleModeBadge.tsx`
 
 ## Open Questions Synced From Canvas
 
 `canvas/questions.md` contains an earlier answered Q&A about connecting module options to real services. That answer remains technically useful for future connector mode, but it is no longer the immediate product priority.
 
-| Question | Owner | Status |
-| --- | --- | --- |
-| How do module options connect to actual services? | Project | Answered for future connector mode in `.assistant/canvas/questions.md` |
-| Should Horizon require real services on first run? | Project | Answered: no, demo/sample mode first |
+| Question                                           | Owner   | Status                                                                 |
+| -------------------------------------------------- | ------- | ---------------------------------------------------------------------- |
+| How do module options connect to actual services?  | Project | Answered for future connector mode in `.assistant/canvas/questions.md` |
+| Should Horizon require real services on first run? | Project | Answered: no, demo/sample mode first                                   |
 
 ## Changelog
 
+- 2026-04-26 - Started P-014 implementation rollout by introducing a shared module sample-mode badge and applying it to UniFi and Proxmox widgets.
+- 2026-04-26 - Updated `/api/proxmox` to return sample-mode payloads when connector settings are missing and connected-mode payloads when credentials are present.
 - 2026-04-26 - Reframed backlog and status around demo-first public usability instead of immediate real-service integration.
 - 2026-04-26 - Added P-014 to make demo/sample mode a visible product feature instead of a fallback.
 - 2026-04-26 - Completed P-009 with `lib/sample-data.ts`, `/api/unifi`, and a UniFi widget wired to sample-mode data.

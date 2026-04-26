@@ -12,11 +12,13 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** none
 
 **Acceptance Criteria:**
+
 - [x] `.assistant/backlog.md`, `.assistant/plan.md`, `.assistant/status.md`, and `.assistant/history.md` contain Horizon-specific content.
 - [x] Existing architecture, module, API, deployment, configuration, and operations docs are available under `.assistant/canvas/`.
 - [x] Open questions from `.assistant/canvas/questions.md` are reflected in `.assistant/status.md`.
 
 **Out of Scope:**
+
 - Runtime code changes.
 
 ## P-002: Make Modules Work Without Real Services
@@ -29,12 +31,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
+
 - [ ] The default dashboard renders useful, polished module states without requiring private service credentials.
 - [ ] Widgets/views fetch Horizon API routes or local sample-data helpers rather than embedding ad hoc dummy literals in UI components.
 - [ ] API routes support a documented demo/sample mode when service settings are missing.
 - [ ] At least one representative module is verified end to end in no-credentials mode.
 
 **Out of Scope:**
+
 - Full real-service connector implementation for every built-in module.
 
 ## P-003: Fix Plugin Upload And Delete Authorization Flow
@@ -47,12 +51,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
+
 - [ ] Settings UI either sends a bearer token for module upload/delete or the product explicitly removes browser upload/delete.
 - [ ] Server authorization behavior is documented in canvas and status.
 - [ ] Failed authorization produces an actionable UI message.
 - [ ] Existing route path validation and registry regeneration remain intact.
 
 **Out of Scope:**
+
 - Plugin marketplace or remote plugin discovery.
 
 ## P-004: Align Settings And Module Types
@@ -65,12 +71,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
+
 - [ ] `dashboard.widgetVisuals` is represented in the exported settings types or removed from persisted writes.
 - [ ] Module config field types consistently include observed values such as `select` and `url`.
 - [ ] `lib/modules.ts` and `lib/types.ts` do not drift on manifest/config definitions.
 - [ ] `npm run lint` passes after type cleanup.
 
 **Out of Scope:**
+
 - Large settings migration framework.
 
 ## P-005: Add Demo Contract Tests Or Smoke Checks
@@ -83,12 +91,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-002
 
 **Acceptance Criteria:**
+
 - [ ] Settings route masking and masked-secret preservation are covered by automated or scripted checks.
 - [ ] Registry generation is checked in CI or a documented local smoke command.
 - [ ] At least one module route has sample-mode success and missing-config coverage.
 - [ ] The documented verification path is added to `.assistant/canvas/development.md`.
 
 **Out of Scope:**
+
 - Full browser end-to-end test suite.
 
 ## P-006: Define Real Connector Boundary
@@ -101,6 +111,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-002
 
 **Acceptance Criteria:**
+
 - [ ] The product has a clear distinction between demo/sample mode and opt-in real connector mode.
 - [ ] Real connector routes use bounded timeouts or abort signals where appropriate.
 - [ ] Connector errors avoid leaking credentials, host internals, or raw upstream payloads.
@@ -108,6 +119,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - [ ] Operational caveats are captured in `.assistant/canvas/security-and-operations.md`.
 
 **Out of Scope:**
+
 - Central observability platform.
 
 ## P-007: Define Module Packaging And Distribution Policy
@@ -120,12 +132,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-003
 
 **Acceptance Criteria:**
+
 - [ ] Module zip structure is documented with accepted and rejected examples.
 - [ ] Hidden/internal module behavior is documented.
 - [ ] Upload size, id rules, and registry regeneration behavior are documented in user-facing language.
 - [ ] Security tradeoffs of installing local code are explicit.
 
 **Out of Scope:**
+
 - Signed plugin packages.
 
 ## P-008: Create A Product TRD From Current Implementation
@@ -138,11 +152,13 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
+
 - [ ] `.assistant/trd/horizon-core.md` captures product goals and technical constraints.
 - [ ] Backlog items reference the TRD after creation.
 - [ ] Non-goals and release boundaries are explicit.
 
 **Out of Scope:**
+
 - New feature implementation.
 
 ## P-009: Create Shared Sample Data Layer
@@ -155,12 +171,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
+
 - [x] Shared sample data lives in a predictable location rather than being scattered inside widget components.
 - [x] Sample payloads match the normalized shapes used by widgets and views.
 - [x] Modules can clearly indicate demo/sample mode in UI without looking broken.
 - [x] Adding a new module includes a sample-data expectation in docs.
 
 **Out of Scope:**
+
 - Realistic synchronization with external services.
 
 ## P-010: Update Onboarding For Public Demo-First Use
@@ -173,17 +191,19 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-002
 
 **Acceptance Criteria:**
+
 - [ ] First run explains that Horizon works immediately with demo/sample data.
 - [ ] Settings clearly label real service connections as optional advanced configuration.
 - [ ] README and canvas docs no longer imply real credentials are required for a useful experience.
 - [ ] Users can discover how to switch from sample mode to a real connector later.
 
 **Out of Scope:**
+
 - Guided multi-step setup wizard.
 
 ## P-014: Make Demo Mode A Visible Product Feature
 
-- **Status:** Todo
+- **Status:** In Progress
 - **Priority:** Now
 - **Tags:** demo-data, ux, product, modules
 - **Reference:** `.assistant/suggestions.md`; ADR-0006; `.assistant/canvas/modules.md`
@@ -191,6 +211,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-009
 
 **Acceptance Criteria:**
+
 - [ ] Sample/demo mode is visibly represented in module widgets and module settings without feeling like an error state.
 - [ ] Modules expose a consistent mode label or badge for `sample` and future `connected` states.
 - [ ] Empty credentials keep modules in sample mode instead of showing failure by default.
@@ -198,6 +219,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - [ ] At least one representative module demonstrates the complete visible sample-mode pattern.
 
 **Out of Scope:**
+
 - Full connected-mode implementation for all modules.
 
 ## P-015: Polish First-Build Dashboard Defaults
@@ -210,12 +232,14 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-009
 
 **Acceptance Criteria:**
+
 - [x] Fresh default settings use explicit React Grid Layout objects instead of bare widget id strings.
 - [x] Legacy string layouts are normalized before rendering so older settings do not collapse widgets.
 - [x] First-build dashboard uses widgets that render without private service credentials.
 - [x] Bundled `data/settings.json` matches the first-run sample dashboard.
 
 **Out of Scope:**
+
 - Full sample-mode migration for every module.
 
 ## P-011: Configure Built-In Modules Through The UI
@@ -228,6 +252,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-004, P-009
 
 **Acceptance Criteria:**
+
 - [ ] Every built-in visible module can be opened from the settings UI and configured from its manifest-defined fields.
 - [ ] Users can choose module mode where applicable: sample/demo first, connected later.
 - [ ] Saving module settings updates `data/settings.json` through `/api/settings` without exposing secrets back to the UI.
@@ -235,6 +260,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - [ ] A module with no saved credentials still renders a useful sample state.
 
 **Out of Scope:**
+
 - Full real connector implementation for every module.
 
 ## P-012: Add Custom Modules Through The UI
@@ -247,6 +273,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-003, P-007, P-009
 
 **Acceptance Criteria:**
+
 - [ ] Users can add a custom module from the UI by providing required manifest metadata: id, name, icon, color, and capabilities.
 - [ ] The UI can create a starter module that works in sample mode without external credentials.
 - [ ] Custom modules appear in the module registry after creation or upload.
@@ -254,6 +281,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - [ ] Users get clear next steps for editing module files locally or packaging/uploading a module.
 
 **Out of Scope:**
+
 - Browser-based arbitrary code editing.
 - Remote module marketplace.
 
@@ -267,10 +295,12 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-011, P-012
 
 **Acceptance Criteria:**
+
 - [ ] Docs describe configuring built-in modules through the UI.
 - [ ] Docs describe adding a custom module through the UI.
 - [ ] Docs describe the local file contract for custom modules.
 - [ ] Docs explain sample mode, connected mode, and when credentials are optional.
 
 **Out of Scope:**
+
 - Full public website documentation rewrite.

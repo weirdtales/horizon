@@ -3,6 +3,7 @@
 import React from 'react';
 import { Wifi, Activity, Download, Loader2 } from 'lucide-react';
 import { useService } from '@/app/hooks/useService';
+import ModuleModeBadge from '@/components/ModuleModeBadge';
 import { UNIFI_SAMPLE_DATA, type SampleModuleResponse, type UniFiSampleData } from '@/lib/sample-data';
 
 export default function UniFiWidget() {
@@ -68,19 +69,7 @@ export default function UniFiWidget() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {isSample && (
-                        <span
-                            style={{
-                                padding: '4px 8px',
-                                borderRadius: '999px',
-                                background: 'rgba(5, 89, 201, 0.1)',
-                                color: '#0559C9',
-                                fontSize: '10px',
-                                fontWeight: 900,
-                                textTransform: 'uppercase',
-                            }}
-                        >
-                            Sample
-                        </span>
+                        <ModuleModeBadge mode="sample" accentColor="#0559C9" backgroundColor="rgba(5, 89, 201, 0.1)" />
                     )}
                     <Activity size={20} color="#0559C9" />
                 </div>

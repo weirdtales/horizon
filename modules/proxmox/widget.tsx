@@ -1,9 +1,39 @@
 'use client';
 
 import React from 'react';
-import { Server, Monitor, Box } from 'lucide-react';
+import { Server, Monitor, Box, Activity, Loader2 } from 'lucide-react';
+import { useService } from '@/app/hooks/useService';
+import ModuleModeBadge from '@/components/ModuleModeBadge';
+import { PROXMOX_SAMPLE_DATA, type ProxmoxSampleData, type SampleModuleResponse } from '@/lib/sample-data';
 
 export default function ProxmoxWidget() {
+    const { data, loading, error } = useService<
+        SampleModuleResponse<ProxmoxSampleData> & { connectorConfigured?: boolean }
+    >('proxmox', 60000);
+    const payload = data || PROXMOX_SAMPLE_DATA;
+    const proxmox = payload.data;
+    const isSample = payload.mode === 'sample' || Boolean(error);
+
+    if (loading && !data) {
+        return (
+            <div
+                className="proxmox-theme"
+                style={{
+                    height: '100%',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '16px',
+                }}
+            >
+                <Loader2 className="animate-spin" color="#e57000" size={32} />
+                <div style={{ fontSize: '13px', opacity: 0.5 }}>Loading cluster sample...</div>
+            </div>
+        );
+    }
+
     return (
         <div
             className="proxmox-theme"
@@ -15,29 +45,39 @@ export default function ProxmoxWidget() {
                 justifyContent: 'space-between',
             }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-                <div
-                    style={{
-                        backgroundColor: 'rgba(229, 112, 0, 0.1)',
-                        color: '#e57000',
-                        padding: '12px',
-                        borderRadius: '16px',
-                    }}
-                >
-                    <Server size={24} />
-                </div>
-                <div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Proxmox Node</h3>
-                    <div style={{ fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)' }}>
-                        pve-cluster-primary
+            <div
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div
+                        style={{
+                            backgroundColor: 'rgba(229, 112, 0, 0.1)',
+                            color: '#e57000',
+                            padding: '12px',
+                            borderRadius: '16px',
+                        }}
+                    >
+                        <Server size={24} />
                     </div>
+                    <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Proxmox Node</h3>
+                        <div style={{ fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)' }}>
+                            {proxmox.nodeName}
+                        </div>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {isSample && (
+                        <ModuleModeBadge mode="sample" accentColor="#e57000" backgroundColor="rgba(229, 112, 0, 0.1)" />
+                    )}
+                    <Activity size={20} color="#e57000" />
                 </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
                 {[
-                    { label: 'CPU Load', value: 14.2, color: '#e57000' },
-                    { label: 'Memory', value: 42.8, color: '#e57000' },
+                    { label: 'CPU Load', value: proxmox.cpuLoadPercent, color: '#e57000' },
+                    { label: 'Memory', value: proxmox.memoryPercent, color: '#e57000' },
                 ].map(resource => (
                     <div key={resource.label}>
                         <div
@@ -92,7 +132,7 @@ export default function ProxmoxWidget() {
                         opacity: 0.8,
                     }}
                 >
-                    <Monitor size={12} color="var(--md-color-service-status-ok)" /> 14 VMs
+                    <Monitor size={12} color="var(--md-color-service-status-ok)" /> {proxmox.vmCount} VMs
                 </div>
                 <div
                     style={{
@@ -104,7 +144,7 @@ export default function ProxmoxWidget() {
                         opacity: 0.8,
                     }}
                 >
-                    <Box size={12} color="var(--md-color-service-status-ok)" /> 8 CTs
+                    <Box size={12} color="var(--md-color-service-status-ok)" /> {proxmox.containerCount} CTs
                 </div>
             </div>
         </div>

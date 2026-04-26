@@ -39,7 +39,14 @@ export type AppSettings = {
     loopia: { user?: string; password?: string };
     cloudflare: { token?: string; accountId?: string };
     unifi: { host?: string; user?: string; password?: string; site?: string };
-    proxmox: { host?: string; tokenId?: string; tokenSecret?: string };
+    proxmox: {
+        host?: string;
+        url?: string;
+        user?: string;
+        tokenId?: string;
+        tokenName?: string;
+        tokenSecret?: string;
+    };
     radarr: { url?: string; apiKey?: string };
     sonarr: { url?: string; apiKey?: string };
     homeassistant: { url?: string; token?: string };

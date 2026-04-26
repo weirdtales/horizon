@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSettings } from '@/lib/settings';
+import { PROXMOX_SAMPLE_DATA } from '@/lib/sample-data';
 
 interface ProxmoxNode {
     node: string;
@@ -24,16 +25,23 @@ interface ProxmoxResource {
 }
 
 export async function GET() {
-    const settings = await getSettings();
+    const settings = getSettings();
     const proxmox = settings.proxmox;
+    const host = proxmox?.host || proxmox?.url;
+    const tokenId =
+        proxmox?.tokenId || (proxmox?.user && proxmox?.tokenName ? `${proxmox.user}!${proxmox.tokenName}` : undefined);
+    const connectorConfigured = Boolean(host && tokenId && proxmox?.tokenSecret);
 
-    if (!proxmox || !proxmox.host || !proxmox.tokenId || !proxmox.tokenSecret) {
-        return NextResponse.json({ error: 'Proxmox not configured' }, { status: 400 });
+    if (!connectorConfigured) {
+        return NextResponse.json({
+            ...PROXMOX_SAMPLE_DATA,
+            connectorConfigured: false,
+        });
     }
 
     // SSRF / Basic URL Validation
     try {
-        const url = new URL(proxmox.host);
+        const url = new URL(host);
         if (!['http:', 'https:'].includes(url.protocol)) {
             throw new Error('Invalid protocol');
         }
@@ -47,10 +55,10 @@ export async function GET() {
         timeoutId = setTimeout(() => controller.abort(), 10000);
 
         // Remove trailing slash if present
-        const baseUrl = proxmox.host.replace(/\/$/, '');
+        const baseUrl = host.replace(/\/$/, '');
 
         // Proxmox Token Auth Header: PVEAPIToken=USER@REALM!TOKENID=SECRET
-        const authHeader = `PVEAPIToken=${proxmox.tokenId}=${proxmox.tokenSecret}`;
+        const authHeader = `PVEAPIToken=${tokenId}=${proxmox.tokenSecret}`;
 
         // 1. Fetch Nodes
         const nodesRes = await fetch(`${baseUrl}/api2/json/nodes`, {
@@ -83,8 +91,21 @@ export async function GET() {
         clearTimeout(timeoutId);
         timeoutId = undefined;
 
+        const primaryNode = nodes[0];
+        const vmCount = resources.filter(resource => resource.type === 'qemu').length;
+        const containerCount = resources.filter(resource => resource.type === 'lxc').length;
+
         return NextResponse.json({
             status: 'online',
+            mode: 'connected',
+            connectorConfigured: true,
+            data: {
+                nodeName: primaryNode?.node || 'Proxmox Cluster',
+                cpuLoadPercent: Number((((primaryNode?.cpu || 0) / (primaryNode?.maxcpu || 1)) * 100).toFixed(1)),
+                memoryPercent: Number((((primaryNode?.mem || 0) / (primaryNode?.maxmem || 1)) * 100).toFixed(1)),
+                vmCount,
+                containerCount,
+            },
             nodes: nodes.map(n => ({
                 name: n.node,
                 status: n.status,

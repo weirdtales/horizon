@@ -15,6 +15,14 @@ export interface UniFiSampleData {
     trafficPercent: number;
 }
 
+export interface ProxmoxSampleData {
+    nodeName: string;
+    cpuLoadPercent: number;
+    memoryPercent: number;
+    vmCount: number;
+    containerCount: number;
+}
+
 export const UNIFI_SAMPLE_DATA: SampleModuleResponse<UniFiSampleData> = {
     status: 'online',
     mode: 'sample',
@@ -28,3 +36,14 @@ export const UNIFI_SAMPLE_DATA: SampleModuleResponse<UniFiSampleData> = {
     },
 };
 
+export const PROXMOX_SAMPLE_DATA: SampleModuleResponse<ProxmoxSampleData> = {
+    status: 'online',
+    mode: 'sample',
+    data: {
+        nodeName: 'pve-cluster-primary',
+        cpuLoadPercent: 14.2,
+        memoryPercent: 42.8,
+        vmCount: 14,
+        containerCount: 8,
+    },
+};
