@@ -26,6 +26,7 @@ API routes live under `app/api`. For the public demo-first product direction, ro
 | `/api/proxmox` | route-defined | Proxmox data |
 | `/api/radarr` | route-defined | Radarr data |
 | `/api/sonarr` | route-defined | Sonarr data |
+| `/api/unifi` | `GET` | UniFi sample-mode data and connector readiness |
 | `/api/weather/geocode` | route-defined | Weather location lookup |
 | `/api/workspace` | route-defined | Google Workspace data |
 | `/api/workspace/auth` | route-defined | Google OAuth start/auth helper |
@@ -78,6 +79,12 @@ The default route behavior should be:
 - Include a clear mode marker such as `mode: "sample"` or equivalent metadata.
 - Keep the payload shape compatible with the connected mode so widgets do not need separate rendering branches.
 - Treat real upstream calls as optional connector behavior, not the baseline requirement.
+
+Initial implementation:
+
+- `lib/sample-data.ts` contains the first shared sample data contract.
+- `/api/unifi` returns `UNIFI_SAMPLE_DATA` with `mode: "sample"` and a `connectorConfigured` flag.
+- `modules/unifi/widget.tsx` consumes `/api/unifi` and falls back to `UNIFI_SAMPLE_DATA` if needed.
 
 Real connector behavior should:
 

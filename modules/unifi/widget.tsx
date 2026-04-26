@@ -1,9 +1,38 @@
 'use client';
 
 import React from 'react';
-import { Wifi, Activity, Download } from 'lucide-react';
+import { Wifi, Activity, Download, Loader2 } from 'lucide-react';
+import { useService } from '@/app/hooks/useService';
+import { UNIFI_SAMPLE_DATA, type SampleModuleResponse, type UniFiSampleData } from '@/lib/sample-data';
 
 export default function UniFiWidget() {
+    const { data, loading, error } = useService<
+        SampleModuleResponse<UniFiSampleData> & { connectorConfigured?: boolean }
+    >('unifi', 60000);
+    const payload = data || UNIFI_SAMPLE_DATA;
+    const unifi = payload.data;
+    const isSample = payload.mode === 'sample' || Boolean(error);
+
+    if (loading && !data) {
+        return (
+            <div
+                className="unifi-theme"
+                style={{
+                    height: '100%',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '16px',
+                }}
+            >
+                <Loader2 className="animate-spin" color="#0559C9" size={32} />
+                <div style={{ fontSize: '13px', opacity: 0.5 }}>Loading network sample...</div>
+            </div>
+        );
+    }
+
     return (
         <div
             className="unifi-theme"
@@ -31,11 +60,30 @@ export default function UniFiWidget() {
                         <Wifi size={24} />
                     </div>
                     <div>
-                        <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>UniFi Controller</h3>
-                        <div style={{ fontSize: '12px', color: '#0559C9', fontWeight: 600 }}>Uptime: 42 Days</div>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>{unifi.controllerName}</h3>
+                        <div style={{ fontSize: '12px', color: '#0559C9', fontWeight: 600 }}>
+                            Uptime: {unifi.uptimeDays} Days
+                        </div>
                     </div>
                 </div>
-                <Activity size={20} color="#0559C9" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {isSample && (
+                        <span
+                            style={{
+                                padding: '4px 8px',
+                                borderRadius: '999px',
+                                background: 'rgba(5, 89, 201, 0.1)',
+                                color: '#0559C9',
+                                fontSize: '10px',
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            Sample
+                        </span>
+                    )}
+                    <Activity size={20} color="#0559C9" />
+                </div>
             </div>
 
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
@@ -49,7 +97,9 @@ export default function UniFiWidget() {
                         border: '1px solid var(--md-sys-color-outline-variant)',
                     }}
                 >
-                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>42</div>
+                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>
+                        {unifi.clients}
+                    </div>
                     <div
                         style={{
                             fontSize: '10px',
@@ -71,7 +121,9 @@ export default function UniFiWidget() {
                         border: '1px solid var(--md-sys-color-outline-variant)',
                     }}
                 >
-                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>4</div>
+                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>
+                        {unifi.devices}
+                    </div>
                     <div
                         style={{
                             fontSize: '10px',
@@ -97,7 +149,7 @@ export default function UniFiWidget() {
                 >
                     <span>Traffic Speed</span>
                     <span style={{ color: 'var(--md-color-service-status-ok)' }}>
-                        <Download size={14} style={{ display: 'inline', marginRight: 4 }} /> 842 Mbps
+                        <Download size={14} style={{ display: 'inline', marginRight: 4 }} /> {unifi.trafficMbps} Mbps
                     </span>
                 </div>
                 <div
@@ -109,7 +161,14 @@ export default function UniFiWidget() {
                         overflow: 'hidden',
                     }}
                 >
-                    <div style={{ width: '65%', height: '100%', backgroundColor: '#0559C9', borderRadius: '4px' }} />
+                    <div
+                        style={{
+                            width: `${unifi.trafficPercent}%`,
+                            height: '100%',
+                            backgroundColor: '#0559C9',
+                            borderRadius: '4px',
+                        }}
+                    />
                 </div>
             </div>
         </div>

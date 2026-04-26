@@ -6,7 +6,8 @@ Last updated: 2026-04-26
 
 - [x] P-001: Normalize Assistant Workspace
 - [ ] P-002: Make Modules Work Without Real Services
-- [ ] P-009: Create Shared Sample Data Layer
+- [x] P-009: Create Shared Sample Data Layer
+- [ ] P-014: Make Demo Mode A Visible Product Feature
 - [ ] P-010: Update Onboarding For Public Demo-First Use
 - [ ] P-004: Align Settings And Module Types
 - [ ] P-011: Configure Built-In Modules Through The UI
@@ -30,5 +31,7 @@ Last updated: 2026-04-26
 ## Plan Changes
 
 - 2026-04-26: Reframed NOW around public demo-first usability. Real service connectors moved out of immediate product goal.
+- 2026-04-26: Promoted visible demo/sample mode into P-014.
+- 2026-04-26: Completed P-009 with shared sample data and UniFi sample-mode route/widget pattern.
 - 2026-04-26: Added UI module setup and custom module planning items.
 - 2026-04-26: Created initial Horizon plan from migration review, existing docs, changelog, and current code caveats.

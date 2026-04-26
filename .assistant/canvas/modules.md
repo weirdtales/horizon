@@ -180,11 +180,28 @@ Every user-facing module should have an intentional no-credentials state.
 
 Preferred behavior:
 
-- Sample data is centralized in a predictable helper or data file.
+- Sample data is centralized in a predictable helper or data file. The initial shared location is `lib/sample-data.ts`.
 - Sample payload shape matches connected payload shape.
 - Widgets can show a subtle demo/sample indicator without looking broken.
 - Missing connector settings are not treated as an error for first-run usage.
 - Real service failures should not prevent the module from showing a useful fallback when appropriate.
+
+Current pattern:
+
+```ts
+import { UNIFI_SAMPLE_DATA } from '@/lib/sample-data';
+```
+
+Module routes can return sample data when connector settings are missing:
+
+```ts
+return NextResponse.json({
+    ...UNIFI_SAMPLE_DATA,
+    connectorConfigured,
+});
+```
+
+Widgets should consume the same payload shape used by the route. If a route is unavailable, widgets may fall back to the shared sample data instead of rendering a broken state.
 
 ## View Contract
 

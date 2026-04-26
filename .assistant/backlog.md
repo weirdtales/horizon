@@ -147,7 +147,7 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 
 ## P-009: Create Shared Sample Data Layer
 
-- **Status:** Todo
+- **Status:** Done
 - **Priority:** Now
 - **Tags:** demo-data, architecture, modules
 - **Reference:** New product direction: works for everybody before real service setup
@@ -155,10 +155,10 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 - **Depends on:** P-001
 
 **Acceptance Criteria:**
-- [ ] Shared sample data lives in a predictable location rather than being scattered inside widget components.
-- [ ] Sample payloads match the normalized shapes used by widgets and views.
-- [ ] Modules can clearly indicate demo/sample mode in UI without looking broken.
-- [ ] Adding a new module includes a sample-data expectation in docs.
+- [x] Shared sample data lives in a predictable location rather than being scattered inside widget components.
+- [x] Sample payloads match the normalized shapes used by widgets and views.
+- [x] Modules can clearly indicate demo/sample mode in UI without looking broken.
+- [x] Adding a new module includes a sample-data expectation in docs.
 
 **Out of Scope:**
 - Realistic synchronization with external services.
@@ -180,6 +180,25 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 
 **Out of Scope:**
 - Guided multi-step setup wizard.
+
+## P-014: Make Demo Mode A Visible Product Feature
+
+- **Status:** Todo
+- **Priority:** Now
+- **Tags:** demo-data, ux, product, modules
+- **Reference:** `.assistant/suggestions.md`; ADR-0006; `.assistant/canvas/modules.md`
+- **Effort Estimate:** 1-2 days
+- **Depends on:** P-009
+
+**Acceptance Criteria:**
+- [ ] Sample/demo mode is visibly represented in module widgets and module settings without feeling like an error state.
+- [ ] Modules expose a consistent mode label or badge for `sample` and future `connected` states.
+- [ ] Empty credentials keep modules in sample mode instead of showing failure by default.
+- [ ] The dashboard communicates that sample data is intentional and editable/configurable.
+- [ ] At least one representative module demonstrates the complete visible sample-mode pattern.
+
+**Out of Scope:**
+- Full connected-mode implementation for all modules.
 
 ## P-011: Configure Built-In Modules Through The UI
 

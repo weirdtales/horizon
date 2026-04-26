@@ -43,36 +43,37 @@ export const MODULE_MANIFESTS = [
     workspaceManifest,
 ];
 
-export const MODULE_WIDGETS: Record<string, React.ComponentType<object>> = {
-    adguard: dynamic(() => import('@/modules/adguard/widget')),
-    cloudflare: dynamic(() => import('@/modules/cloudflare/widget')),
-    dockge: dynamic(() => import('@/modules/dockge/widget')),
+export const MODULE_WIDGETS: Record<string, any> = {
+    'adguard': dynamic(() => import('@/modules/adguard/widget')),
+    'cloudflare': dynamic(() => import('@/modules/cloudflare/widget')),
+    'dockge': dynamic(() => import('@/modules/dockge/widget')),
     'example-hello': dynamic(() => import('@/modules/example-hello/widget')),
-    glances: dynamic(() => import('@/modules/glances/widget')),
-    homeassistant: dynamic(() => import('@/modules/homeassistant/widget')),
-    immich: dynamic(() => import('@/modules/immich/widget')),
-    loopia: dynamic(() => import('@/modules/loopia/widget')),
-    npm: dynamic(() => import('@/modules/npm/widget')),
-    pihole: dynamic(() => import('@/modules/pihole/widget')),
-    plex: dynamic(() => import('@/modules/plex/widget')),
-    proxmox: dynamic(() => import('@/modules/proxmox/widget')),
-    radarr: dynamic(() => import('@/modules/radarr/widget')),
-    scrypted: dynamic(() => import('@/modules/scrypted/widget')),
-    sonarr: dynamic(() => import('@/modules/sonarr/widget')),
-    unifi: dynamic(() => import('@/modules/unifi/widget')),
-    uptimekuma: dynamic(() => import('@/modules/uptimekuma/widget')),
-    weather: dynamic(() => import('@/modules/weather/widget')),
-    workspace: dynamic(() => import('@/modules/workspace/widget')),
+    'glances': dynamic(() => import('@/modules/glances/widget')),
+    'homeassistant': dynamic(() => import('@/modules/homeassistant/widget')),
+    'immich': dynamic(() => import('@/modules/immich/widget')),
+    'loopia': dynamic(() => import('@/modules/loopia/widget')),
+    'npm': dynamic(() => import('@/modules/npm/widget')),
+    'pihole': dynamic(() => import('@/modules/pihole/widget')),
+    'plex': dynamic(() => import('@/modules/plex/widget')),
+    'proxmox': dynamic(() => import('@/modules/proxmox/widget')),
+    'radarr': dynamic(() => import('@/modules/radarr/widget')),
+    'scrypted': dynamic(() => import('@/modules/scrypted/widget')),
+    'sonarr': dynamic(() => import('@/modules/sonarr/widget')),
+    'unifi': dynamic(() => import('@/modules/unifi/widget')),
+    'uptimekuma': dynamic(() => import('@/modules/uptimekuma/widget')),
+    'weather': dynamic(() => import('@/modules/weather/widget')),
+    'workspace': dynamic(() => import('@/modules/workspace/widget')),
 };
 
-export const MODULE_VIEWS: Record<string, React.ComponentType<object>> = {
-    cloudflare: dynamic(() => import('@/modules/cloudflare/view')),
+export const MODULE_VIEWS: Record<string, any> = {
+    'cloudflare': dynamic(() => import('@/modules/cloudflare/view')),
     'example-hello': dynamic(() => import('@/modules/example-hello/view')),
-    loopia: dynamic(() => import('@/modules/loopia/view')),
-    plex: dynamic(() => import('@/modules/plex/view')),
-    radarr: dynamic(() => import('@/modules/radarr/view')),
-    sonarr: dynamic(() => import('@/modules/sonarr/view')),
+    'loopia': dynamic(() => import('@/modules/loopia/view')),
+    'plex': dynamic(() => import('@/modules/plex/view')),
+    'radarr': dynamic(() => import('@/modules/radarr/view')),
+    'sonarr': dynamic(() => import('@/modules/sonarr/view')),
 };
+
 
 export function getModuleManifest(id: string) {
     return MODULE_MANIFESTS.find(m => m.id === id);

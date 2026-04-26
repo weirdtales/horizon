@@ -5,13 +5,13 @@
 
 ## Focus
 
-Shift Horizon toward public, demo-first usability and UI-driven module ownership. Immediate engineering focus is P-002, P-009, P-011, and P-013: modules should work without credentials, be configurable through the UI, and have a clear custom module workflow.
+Shift Horizon toward public, demo-first usability and UI-driven module ownership. Immediate engineering focus is P-002, P-009, P-014, P-011, and P-013: modules should work without credentials, make demo mode visible as intentional product behavior, be configurable through the UI, and have a clear custom module workflow.
 
 Plan pointer: `.assistant/plan.md`
 
 ## Now / Next / Later
 
-- **Now:** P-001, P-002, P-009, P-010, P-004, P-011, P-013
+- **Now:** P-001, P-002, P-014, P-010, P-004, P-011, P-013
 - **Next:** P-003, P-005, P-006, P-007, P-012
 - **Later:** P-008 and broader regression/security policy work
 
@@ -58,6 +58,8 @@ Plan pointer: `.assistant/plan.md`
 ## Changelog
 
 - 2026-04-26 - Reframed backlog and status around demo-first public usability instead of immediate real-service integration.
+- 2026-04-26 - Added P-014 to make demo/sample mode a visible product feature instead of a fallback.
+- 2026-04-26 - Completed P-009 with `lib/sample-data.ts`, `/api/unifi`, and a UniFi widget wired to sample-mode data.
 - 2026-04-26 - Added ADR-0006 for demo-first module data and updated architecture/development docs around sample mode.
 - 2026-04-26 - Added planning for configuring built-in modules through the UI and adding custom modules.
 - 2026-04-26 - Migrated Horizon planning state into `.assistant/backlog.md`, `.assistant/plan.md`, `.assistant/status.md`, and `.assistant/history.md`.

@@ -65,6 +65,36 @@
 
 - Horizon should let users configure built-in modules from the UI and should support creating starter custom modules from the UI. Custom modules still resolve to normal source files under `modules/<id>/` and the generated registry remains the app's module discovery mechanism.
 
+## Session Update: 2026-04-26
+
+**Focus:** Promote visible demo/sample mode into the backlog.
+
+### Completed
+
+- Added P-014 for making demo mode a visible product feature.
+- Updated plan and status to include P-014 in Now.
+
+### Decision
+
+- Demo/sample mode should be treated as intentional product behavior in widgets and settings, not as a hidden fallback for missing credentials.
+
+## Session Update: 2026-04-26
+
+**Focus:** Implement P-009 shared sample data layer.
+
+### Completed
+
+- Added `lib/sample-data.ts` with shared module sample data types and UniFi sample payload.
+- Added `/api/unifi` to return sample-mode UniFi data and connector readiness.
+- Updated `modules/unifi/widget.tsx` to fetch `/api/unifi`, fall back to shared sample data, and render a sample badge.
+- Updated module and API canvas docs with the initial sample-data pattern.
+- Marked P-009 Done in backlog and plan.
+
+### Next
+
+- Continue P-002 by migrating more modules away from scattered placeholder literals.
+- Continue P-014 by formalizing the sample/connected mode visual treatment beyond UniFi.
+
 ## Condensed Project Milestones
 
 - 2026-04-15: Horizon Core 1.0.0 launched with customizable bento dashboard, dark/light themes, global settings search, and initial Loopia, Cloudflare, Plex, Immich, and Home Assistant support.
