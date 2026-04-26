@@ -48,7 +48,7 @@ Write behavior:
 
 ## Core Settings Sections
 
-### Service Settings
+### Module And Connector Settings
 
 Each module can have a top-level settings object keyed by module id:
 
@@ -61,7 +61,66 @@ Each module can have a top-level settings object keyed by module id:
 }
 ```
 
-These values are defined by each module manifest's `configFields`.
+These values are defined by each module manifest's `configFields`. For the current demo-first direction, these settings are optional connector settings. Missing credentials should not make the default dashboard unusable; modules should fall back to sample/local data where possible.
+
+Recommended mode model:
+
+```json
+{
+  "sonarr": {
+    "mode": "sample",
+    "url": "",
+    "apiKey": ""
+  }
+}
+```
+
+The exact persisted shape still needs implementation, but product behavior should distinguish:
+
+- `sample`: works for everyone without credentials.
+- `connected`: uses saved connector settings to call a real service.
+- `offline` or `misconfigured`: only applies after the user opts into real connector mode.
+
+### Module UI Setup
+
+Normal users should configure modules through the settings UI, not by manually editing `data/settings.json`.
+
+Expected setup behavior:
+
+- Built-in modules are listed from the generated registry.
+- The settings UI renders module fields from each manifest's `configFields`.
+- Users can save connector settings per module.
+- Secrets returned by `/api/settings` remain masked.
+- Empty connector settings keep the module in sample mode instead of producing a broken dashboard.
+- Module enablement controls whether native views appear in navigation.
+
+### Custom Module Metadata
+
+Custom modules created through the UI should persist source files under `modules/<id>/`, not only settings data.
+
+Settings can track UI-level state for custom modules:
+
+```json
+{
+  "modules": {
+    "my-module": {
+      "enabled": true,
+      "mode": "sample"
+    }
+  }
+}
+```
+
+The module source contract remains:
+
+```text
+modules/my-module/
+  module.json
+  widget.tsx
+  view.tsx
+```
+
+The UI should create or upload module files, regenerate `lib/registry.ts`, and then allow normal configuration through the same module settings surface.
 
 ### Dashboard
 
@@ -158,4 +217,3 @@ Optional appearance keys include `userName`, `bgType`, `backgroundColor`, `backg
 ```
 
 Enablement controls module navigation. Widgets can still be placed on the dashboard if they are registered and present in layout data.
-

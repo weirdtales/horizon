@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+
+    "filesystem": {
+      "_description": "Read/write files and directories — useful for large codebases",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/path/to/your/project"
+      ]
+    },
+
+    "github": {
+      "_description": "Create/read issues, PRs, comments, and labels on GitHub repos",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+
+    "fetch": {
+      "_description": "Fetch web pages and APIs — useful for research and reading docs",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+
+    "memory": {
+      "_description": "Persistent key-value memory across sessions",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+
+    "playwright": {
+      "_description": "Browser automation — run and generate end-to-end tests",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+
+    "postgres": {
+      "_description": "Query a PostgreSQL database directly — useful for schema exploration",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      }
+    }
+
+  }
+}

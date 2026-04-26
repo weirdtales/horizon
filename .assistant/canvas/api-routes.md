@@ -1,6 +1,6 @@
 # API Routes
 
-API routes live under `app/api`. They keep credentials server-side and provide normalized JSON to widgets and views.
+API routes live under `app/api`. For the public demo-first product direction, routes should provide normalized JSON that works without credentials first, then optionally call real services when connector settings are present.
 
 ## Route Inventory
 
@@ -70,6 +70,22 @@ Route-defined methods should be checked in each `route.ts` file before calling d
 - Removes `modules/<id>/`.
 - Regenerates `lib/registry.ts`.
 
+## Demo-First Route Contract
+
+The default route behavior should be:
+
+- Return a useful sample payload when no real connector settings are configured.
+- Include a clear mode marker such as `mode: "sample"` or equivalent metadata.
+- Keep the payload shape compatible with the connected mode so widgets do not need separate rendering branches.
+- Treat real upstream calls as optional connector behavior, not the baseline requirement.
+
+Real connector behavior should:
+
+- Read credentials through `getSettings()`.
+- Keep credentials server-side.
+- Use timeouts or abort signals for upstream calls.
+- Return sanitized errors and a clear `offline` or `misconfigured` state when needed.
+
 ## Client Fetch Pattern
 
 Widgets generally use `app/hooks/useService.ts`:
@@ -80,7 +96,7 @@ const { data, loading, error, refetch } = useService('sonarr', 45000);
 
 The hook requests `/api/<endpoint>`, treats non-2xx responses as errors, treats returned `json.error` or `json.status === 'offline'` as service failures, and refreshes on an interval.
 
-## Adding A Service API
+## Adding A Module API
 
 Recommended shape:
 
@@ -93,15 +109,18 @@ export async function GET() {
     const config = settings['my-module'] as { url?: string; apiKey?: string };
 
     if (!config?.url || !config?.apiKey) {
-        return NextResponse.json({ status: 'offline', error: 'Missing configuration' }, { status: 400 });
+        return NextResponse.json({
+            status: 'online',
+            mode: 'sample',
+            items: []
+        });
     }
 
     try {
-        // Fetch external service here.
-        return NextResponse.json({ status: 'online' });
+        // Optional real connector call here.
+        return NextResponse.json({ status: 'online', mode: 'connected' });
     } catch {
         return NextResponse.json({ status: 'offline', error: 'Service unavailable' }, { status: 502 });
     }
 }
 ```
-

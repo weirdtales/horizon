@@ -69,12 +69,13 @@ Add `app/api/<name>/route.ts`.
 
 Preferred route behavior:
 
-- Read credentials through `getSettings()`.
-- Validate required configuration before external calls.
+- Return a useful sample-mode payload when connector settings are missing.
+- Read optional connector credentials through `getSettings()`.
+- Validate required configuration before external calls when connected mode is enabled.
 - Return normalized JSON for widgets and views.
 - Avoid leaking internal errors to the client.
 - Use `sanitizeUrl` for user-configured URLs before using them in UI-facing paths.
-- Keep credentials server-side only.
+- Keep optional connector credentials server-side only.
 
 ## Adding A Module
 
@@ -104,4 +105,3 @@ data/settings.json
 ```
 
 Delete or move this file to return to defaults. Preserve it when testing migrations or behavior that depends on existing settings.
-

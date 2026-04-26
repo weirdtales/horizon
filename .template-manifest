@@ -1,0 +1,68 @@
+# Template Manifest
+# -----------------
+# Files listed here are owned by the template and safe to overwrite on update.
+# Everything NOT listed here is project-specific and will never be touched.
+#
+# To update your project: make update-template
+#
+# Project-specific files intentionally excluded:
+#   .assistant/plan.md
+#   .assistant/status.md
+#   .assistant/backlog.md
+#   .assistant/history.md
+#   .assistant/task_log.md
+#   .assistant/canvas/*.md
+#   .assistant/trd/*.md        (except sample.md)
+#   .assistant/adr/ADR-*.md
+
+# ── Root ──────────────────────────────────────────────────────────────────────
+.template-manifest
+CLAUDE.md
+.cursorrules
+.windsurfrules
+.gitignore
+.mcp.json
+Makefile
+TEMPLATE_README.md
+TEMPLATE_GUIDE.md
+QUICK_START.md
+SETUP_CHECKLIST.md
+WORKFLOW.md
+
+# ── GitHub ────────────────────────────────────────────────────────────────────
+.github/copilot-instructions.md
+
+# ── VS Code ───────────────────────────────────────────────────────────────────
+.vscode/tasks.json
+.vscode/keybindings.json
+.vscode/settings.json
+
+# ── Agent docs ────────────────────────────────────────────────────────────────
+.assistant/README.md
+.assistant/assistant.yaml
+.assistant/AGENT_INSTRUCTIONS.md
+.assistant/AGENT_BEST_PRACTICES.md
+.assistant/AGENT_GUARDRAILS.md
+
+# ── Prompts ───────────────────────────────────────────────────────────────────
+.assistant/prompts/project_startup.md
+.assistant/prompts/kickoff.md
+.assistant/prompts/end_session.md
+.assistant/prompts/migration.md
+
+# ── MCP ───────────────────────────────────────────────────────────────────────
+.assistant/mcp/playbook.md
+
+# ── ADR template ──────────────────────────────────────────────────────────────
+.assistant/adr/README.md
+
+# ── Troubleshooting ───────────────────────────────────────────────────────────
+.assistant/troubleshoot/runbook.md
+
+# ── Examples (reference only — never project data) ───────────────────────────
+.assistant/trd/sample.md
+.assistant/examples/plan.md
+.assistant/examples/backlog.md
+.assistant/examples/status.md
+.assistant/examples/adr/ADR-001-auth-strategy.md
+.assistant/examples/adr/ADR-002-database-choice.md

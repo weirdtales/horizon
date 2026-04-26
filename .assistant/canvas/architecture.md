@@ -7,15 +7,16 @@ Horizon is a Next.js App Router application with client-rendered dashboard scree
 ```text
 Browser UI
   |
-  | fetch /api/settings and /api/<service>
+  | fetch /api/settings and /api/<module>
   v
 Next.js App Router
   |
   | reads/writes data/settings.json
   | imports generated lib/registry.ts
-  | proxies service APIs from server routes
+  | returns sample data by default
+  | optionally proxies real services from connector routes
   v
-Configured homelab services
+Sample data or configured connectors
 ```
 
 Important runtime files:
@@ -25,7 +26,7 @@ Important runtime files:
 - `app/settings/page.tsx`: settings UI for appearance, navigation, bookmarks, module config, module enablement, upload, and delete.
 - `app/view/[id]/page.tsx`: renders registered native module views from `MODULE_VIEWS`.
 - `app/view/page.tsx`: iframe wrapper for configured external links.
-- `app/api/*/route.ts`: server-side API boundaries for settings and integrations.
+- `app/api/*/route.ts`: server-side API boundaries for settings, sample module data, and optional integrations.
 - `lib/settings.ts`: default settings and JSON persistence.
 - `lib/registry.ts`: generated module manifest, widget, and view imports.
 - `scripts/generate-registry.mjs`: scans `modules/*` and rewrites `lib/registry.ts`.
@@ -66,6 +67,15 @@ The central API boundary is `/api/settings`:
 
 Client screens should treat `/api/settings` as the source of truth and should not read the file directly.
 
+## Module Data Boundary
+
+The current product direction is demo-first:
+
+- Modules should render useful sample/local data without requiring credentials.
+- API routes should return compatible payload shapes for sample and connected modes.
+- Real external services are optional connector behavior, not the baseline first-run requirement.
+- Widgets should not contain scattered hardcoded dummy literals; sample data should be centralized as implementation work proceeds.
+
 ## Navigation
 
 Navigation is composed from two sources:
@@ -102,4 +112,3 @@ The application uses Material Design 3-inspired CSS variables in `app/globals.cs
 - `data-accent`: selected accent color name.
 
 Global layout reads appearance settings, sanitizes background URLs, and applies the theme on page load and settings updates.
-

@@ -10,6 +10,7 @@ Horizon is a self-hosted Next.js dashboard for homelab services. The app is buil
 - [Development](./development.md): local setup, commands, code generation, and contribution workflow.
 - [Configuration](./configuration.md): persisted settings model, dashboard layout, navigation, appearance, and secrets behavior.
 - [Modules](./modules.md): built-in module inventory and module development contract.
+- [Module UI Workflows](./module-ui-workflows.md): configuring built-in modules and adding custom modules through the UI.
 - [API Routes](./api-routes.md): route inventory and how routes relate to settings and modules.
 - [Deployment](./deployment.md): Docker, bare-metal, persistence, and production notes.
 - [Security And Operations](./security-and-operations.md): security controls, operational checks, and known caveats.
@@ -23,7 +24,7 @@ modules/                Built-in and uploaded dashboard modules
 public/                 Static assets
 scripts/                Build-time registry generation
 data/                   Runtime settings persistence, mounted into Docker
-.docs/                  Maintainer documentation
+.assistant/             Project planning, canvas docs, ADRs, status, and backlog
 ```
 
 ## Primary Commands
@@ -37,4 +38,3 @@ npm run lint
 ```
 
 `npm run dev` and `npm run build` both run `scripts/generate-registry.mjs` first through the `predev` and `prebuild` lifecycle scripts.
-

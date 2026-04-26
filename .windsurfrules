@@ -1,0 +1,116 @@
+# Windsurf Rules
+
+This project uses a TRD-driven, structured planning workflow.
+
+## On Session Start
+
+1. Read `.assistant/status.md` first — current project health and focus
+2. Read `.assistant/plan.md` and `.assistant/backlog.md` for scope
+3. If `status.md` is stale, regenerate from `plan.md`, `backlog.md`, `task_log.md`
+
+## Workspace Structure
+
+```
+.assistant/
+├── status.md       # Always read first
+├── plan.md         # Now / Next / Later roadmap
+├── backlog.md      # Work items with acceptance criteria
+├── task_log.md     # Completed work log
+├── history.md      # Session notes
+├── trd/            # Technical Requirements Documents (source of truth)
+├── canvas/         # vision.md, goals.md, stakeholders.md, questions.md
+├── adr/            # Architecture Decision Records
+└── prompts/        # AI prompts for startup / kickoff / end-session
+```
+
+## Core Workflow
+
+Everything traces back to the TRD:
+TRD → Canvas → Plan → Backlog → Execute → ADRs + Status updates
+
+### TRD Reading Pattern (before planning)
+1. **Structure pass** — Major sections, core vs. nice-to-have, success metrics
+2. **Gaps pass** — Ambiguities, missing constraints, security, scale
+3. **Risks pass** — Conflicting requirements, unknowns, unclear scope
+
+Write a brief TRD summary in `.assistant/trd/` before creating any plan.
+
+- **Planning:** TRD (3 passes + summary) → fill canvas → create plan → create backlog → fill status
+- **Development:** work backlog in order → log in task_log → update status → write ADRs
+- **End of session:** mark backlog done → update status → log in history
+
+## Hard Rules
+
+1. Canvas before plan — never plan without substance in canvas files
+2. Every backlog item cites a TRD section
+3. Backlog items are 1–3 days max — break down anything larger
+4. 3+ testable acceptance criteria per item
+5. ADR for major decisions (database, auth, architecture, scaling)
+6. Ask when TRD is ambiguous — never assume
+7. Document why items move between Now / Next / Later
+8. New requests go to Later unless human explicitly reprioritizes
+9. Resolve questions blocking Now before proceeding
+10. No vague items — specific outcomes, not general intentions
+
+## Backlog Item Format
+
+```markdown
+## FEAT-001: Short Name
+- **Status:** Todo | In Progress | Done
+- **TRD Reference:** Section X.Y — exact quote
+- **Effort Estimate:** N days
+- **Acceptance Criteria:**
+  - [ ] Specific, testable criterion
+  - [ ] Error case with HTTP code
+  - [ ] Performance constraint if applicable
+```
+
+## ADR Format
+
+File: `.assistant/adr/ADR-00N-name.md`
+
+```markdown
+# ADR-00N: [Decision]
+## Status: Proposed | Accepted | Deprecated
+## Context: [Why needed — TRD reference]
+## Decision: [What was chosen]
+## Rationale: [Why this over alternatives]
+## Consequences: [Tradeoffs]
+```
+
+## Scope Creep Pattern
+
+When new requirements appear: **Pause → Map (in TRD?) → Assess (what does it displace?) → Decide (human chooses) → Document in status.md**
+
+## Clarifying Questions Format
+
+Specific + Options + Impact:
+> "TRD says 'authentication' but doesn't specify email-only vs. social login, or 2FA timing. This affects architecture — what's the priority?"
+
+## Backlog Grooming Checklist
+
+- [ ] Every item has a TRD reference
+- [ ] No item > 3 days (break down if so)
+- [ ] 3–5 testable acceptance criteria each
+- [ ] No overlapping items
+- [ ] Dependencies clear
+- [ ] No vague language
+
+## Common Violations
+
+| Wrong | Right |
+|-------|-------|
+| "Auth system" | "Email signup", "Login", "Password reset" |
+| No TRD ref | "TRD 2.1: Users must sign up" |
+| "User can login" | "Session created, 401 on wrong password" |
+| No ADR for DB choice | ADR-002 documenting why PostgreSQL |
+
+## Escalate to Human When
+
+- TRD requirements conflict
+- Timeline estimate differs significantly from plan
+- Major architectural decision needed
+- Item scope unclear after reading TRD
+- New risk not in `status.md`
+
+Full docs: `.assistant/AGENT_INSTRUCTIONS.md`, `.assistant/AGENT_BEST_PRACTICES.md`, `.assistant/AGENT_GUARDRAILS.md`

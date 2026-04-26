@@ -1,6 +1,6 @@
 # Modules
 
-Modules are self-contained dashboard extensions. They live in `modules/<id>/`, declare metadata in `module.json`, and can provide a widget, a native full-page view, or both.
+Modules are self-contained dashboard extensions. They live in `modules/<id>/`, declare metadata in `module.json`, and can provide a widget, a native full-page view, or both. The current product direction is demo-first: modules should render useful states without requiring real service credentials.
 
 ## Module Folder
 
@@ -88,6 +88,69 @@ For `select`, include `options`:
 }
 ```
 
+## Built-In Module Setup In The UI
+
+The settings UI should be the primary place to set up built-in modules.
+
+Expected workflow:
+
+1. Open Settings.
+2. Go to the modules/plugins area.
+3. Select a built-in module.
+4. Review its current mode:
+   - `sample`: default mode; no credentials required.
+   - `connected`: optional future mode; uses saved connector settings.
+   - `offline` or `misconfigured`: only applies after connected mode is enabled.
+5. Edit manifest-defined fields from `configFields`.
+6. Save through `/api/settings`.
+7. Return to the dashboard and see the module render with either sample or connected data.
+
+UI requirements:
+
+- Field labels and placeholders come from `module.json`.
+- Secret fields are masked when loaded back from `/api/settings`.
+- Sample mode must remain available even when connector fields are empty.
+- The user should not need to edit `data/settings.json` manually for normal setup.
+- Module layout placement and module connector settings should be visually distinct.
+
+## Custom Module Setup In The UI
+
+Users should be able to add their own modules without editing framework code.
+
+Minimum UI-created custom module flow:
+
+1. Open Settings.
+2. Choose Add Custom Module.
+3. Enter required manifest fields:
+   - id
+   - name
+   - icon
+   - color
+   - hasWidget
+   - hasView
+4. Optionally add config fields.
+5. Create a starter module in `modules/<id>/`.
+6. Regenerate the module registry.
+7. Show the new module in the settings module list.
+
+The starter module should:
+
+- Render useful sample content immediately.
+- Use the same sample/connected data contract as built-in modules.
+- Include a minimal `module.json`.
+- Include a minimal `widget.tsx`.
+- Include `view.tsx` only if requested.
+
+The UI should validate:
+
+- `id` uses only safe module id characters.
+- `id` does not conflict with an existing module.
+- Required manifest fields are present.
+- Config field keys are safe and unique.
+- Generated files remain inside `modules/<id>/`.
+
+Uploading a packaged custom module remains a separate workflow from generating a starter module. Both workflows need clear validation and error messages.
+
 ## Widget Contract
 
 Widgets are React components loaded dynamically from `MODULE_WIDGETS`.
@@ -109,7 +172,19 @@ export default function MyWidget({ settings }: { settings?: { url?: string } }) 
 }
 ```
 
-For live service data, create a matching API route such as `app/api/my-module/route.ts` and call it with `useService('my-module')`.
+For module data, create a matching API route such as `app/api/my-module/route.ts` and call it with `useService('my-module')`. The route should return sample data by default and connected data only when optional connector settings are configured.
+
+## Sample Data Contract
+
+Every user-facing module should have an intentional no-credentials state.
+
+Preferred behavior:
+
+- Sample data is centralized in a predictable helper or data file.
+- Sample payload shape matches connected payload shape.
+- Widgets can show a subtle demo/sample indicator without looking broken.
+- Missing connector settings are not treated as an error for first-run usage.
+- Real service failures should not prevent the module from showing a useful fallback when appropriate.
 
 ## View Contract
 
@@ -165,4 +240,3 @@ Native views appear in navigation only when the module is enabled in settings an
 `DELETE /api/modules/delete/<id>` removes a module folder.
 
 Both routes expect a bearer token matching `UPLOAD_API_KEY` or `MODULE_API_KEY`. The current settings UI calls these endpoints without adding that authorization header, so browser-based upload and delete require wiring auth into the client or relaxing the server behavior intentionally.
-
