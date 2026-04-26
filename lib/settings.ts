@@ -31,12 +31,20 @@ export const defaultSettings: AppSettings = {
                     {
                         id: 'sec-main',
                         name: 'Network & Systems',
-                        layout: ['weather', 'loopia', 'npm', 'unifi', 'media', 'proxmox', 'workspace'],
+                        layout: [
+                            { i: 'weather', x: 0, y: 0, w: 6, h: 4 },
+                            { i: 'unifi', x: 6, y: 0, w: 6, h: 4 },
+                            { i: 'proxmox', x: 0, y: 4, w: 6, h: 2 },
+                        ],
                     },
                 ],
             },
         ],
-        widgetSizes: {},
+        widgetSizes: {
+            weather: 'large',
+            unifi: 'large',
+            proxmox: 'wide',
+        },
     },
     navigation: [
         { id: 'home', label: 'Dashboard', icon: 'Home', path: '/', visible: true },

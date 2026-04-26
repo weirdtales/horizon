@@ -15,3 +15,11 @@
 - **Reference:** `.assistant/backlog.md`; `.assistant/canvas/modules.md`; `.assistant/canvas/api-routes.md`
 - **Artifacts produced:** `lib/sample-data.ts`, `app/api/unifi/route.ts`, `modules/unifi/widget.tsx`
 - **Notes:** Established the initial sample-mode contract with UniFi as the representative module. Additional modules should migrate to this pattern under P-002/P-014.
+
+## P-015: Polish First-Build Dashboard Defaults
+
+- **Completed:** 2026-04-26
+- **Effort actual:** 1 day
+- **Reference:** `.assistant/backlog.md`; user first-build screenshot
+- **Artifacts produced:** `lib/settings.ts`, `app/page.tsx`, `data/settings.json`
+- **Notes:** Fresh and bundled settings now use full grid layout objects for Weather, UniFi, and Proxmox. Legacy string layouts are normalized in the dashboard before rendering.

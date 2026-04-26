@@ -71,6 +71,53 @@ const WIDGET_DIMENSIONS: Record<string, { w: number; h: number }> = {
     full: { w: 12, h: 2 },
 };
 
+const getWidgetDimensions = (id: string, widgetSizes?: Record<string, string>) => {
+    const sizeType = widgetSizes?.[id] || WIDGET_SIZE_DEFAULTS[id] || 'small';
+    if (sizeType.startsWith('custom-')) {
+        const [, w, h] = sizeType.split('-');
+        const customWidth = Number(w);
+        const customHeight = Number(h);
+        if (Number.isFinite(customWidth) && Number.isFinite(customHeight) && customWidth > 0 && customHeight > 0) {
+            return { w: customWidth, h: customHeight };
+        }
+    }
+    return WIDGET_DIMENSIONS[sizeType] || WIDGET_DIMENSIONS.small;
+};
+
+const normalizeSectionLayout = (
+    layout: DashboardLayoutItem[],
+    widgetSizes?: Record<string, string>
+): DashboardLayoutItem[] => {
+    let cursorX = 0;
+    let cursorY = 0;
+    let rowHeight = 0;
+
+    return layout.map(item => {
+        if (typeof item !== 'string') return item;
+
+        const dims = getWidgetDimensions(item, widgetSizes);
+        if (cursorX + dims.w > 12) {
+            cursorX = 0;
+            cursorY += rowHeight;
+            rowHeight = 0;
+        }
+
+        const normalized = { i: item, x: cursorX, y: cursorY, w: dims.w, h: dims.h };
+        cursorX += dims.w;
+        rowHeight = Math.max(rowHeight, dims.h);
+        return normalized;
+    });
+};
+
+const normalizeDashboardRows = (rows: DashboardRow[], widgetSizes?: Record<string, string>): DashboardRow[] =>
+    rows.map(row => ({
+        ...row,
+        sections: row.sections.map(section => ({
+            ...section,
+            layout: normalizeSectionLayout(section.layout, widgetSizes),
+        })),
+    }));
+
 const V_THEMES = ['default', 'accent', 'tonal', 'glass'];
 const V_OPACITIES = [1, 0.75, 0.4, 0.15];
 const V_THEME_LABELS: Record<string, { label: string; desc: string }> = {
@@ -297,30 +344,34 @@ export default function DashboardHub() {
                     if (data.settings) {
                         setSettings(data.settings);
                         const d = data.settings.dashboard;
-                        if (d?.rows) setRows(d.rows);
+                        const nextWidgetSizes = d?.widgetSizes || {};
+                        setWidgetSizes(nextWidgetSizes);
+
+                        if (d?.rows) setRows(normalizeDashboardRows(d.rows, nextWidgetSizes));
                         else
-                            setRows([
-                                {
-                                    id: 'r-default',
-                                    name: 'System Overview',
-                                    sections: [
+                            setRows(
+                                normalizeDashboardRows(
+                                    [
                                         {
-                                            id: 's-main',
-                                            name: 'Network & Cluster',
-                                            layout: [
-                                                'weather',
-                                                'proxmox',
-                                                'unifi',
-                                                'cloudflare',
-                                                'radarr',
-                                                'workspace',
+                                            id: 'r-default',
+                                            name: 'Home Hub',
+                                            sections: [
+                                                {
+                                                    id: 's-main',
+                                                    name: 'Network & Systems',
+                                                    layout: [
+                                                        { i: 'weather', x: 0, y: 0, w: 6, h: 4 },
+                                                        { i: 'unifi', x: 6, y: 0, w: 6, h: 4 },
+                                                        { i: 'proxmox', x: 0, y: 4, w: 6, h: 2 },
+                                                    ],
+                                                },
                                             ],
                                         },
                                     ],
-                                },
-                            ]);
+                                    nextWidgetSizes
+                                )
+                            );
 
-                        if (d?.widgetSizes) setWidgetSizes(d.widgetSizes);
                         if (d?.widgetVisuals) setWidgetVisuals(d.widgetVisuals);
                         if (data.settings.bookmarks) setBookmarks(data.settings.bookmarks);
 

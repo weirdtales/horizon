@@ -60,6 +60,7 @@ Plan pointer: `.assistant/plan.md`
 - 2026-04-26 - Reframed backlog and status around demo-first public usability instead of immediate real-service integration.
 - 2026-04-26 - Added P-014 to make demo/sample mode a visible product feature instead of a fallback.
 - 2026-04-26 - Completed P-009 with `lib/sample-data.ts`, `/api/unifi`, and a UniFi widget wired to sample-mode data.
+- 2026-04-26 - Completed P-015 to make first-build dashboard defaults render as full-size sample cards.
 - 2026-04-26 - Added ADR-0006 for demo-first module data and updated architecture/development docs around sample mode.
 - 2026-04-26 - Added planning for configuring built-in modules through the UI and adding custom modules.
 - 2026-04-26 - Migrated Horizon planning state into `.assistant/backlog.md`, `.assistant/plan.md`, `.assistant/status.md`, and `.assistant/history.md`.

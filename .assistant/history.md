@@ -95,6 +95,21 @@
 - Continue P-002 by migrating more modules away from scattered placeholder literals.
 - Continue P-014 by formalizing the sample/connected mode visual treatment beyond UniFi.
 
+## Session Update: 2026-04-26
+
+**Focus:** Fix first-build dashboard presentation.
+
+### Completed
+
+- Added explicit grid layout objects to `defaultSettings.dashboard`.
+- Normalized legacy string-based dashboard layouts before rendering.
+- Updated bundled `data/settings.json` to use the first-run sample dashboard.
+- Added P-015 and marked it Done.
+
+### Decision
+
+- First-build defaults should include only widgets that render cleanly without private credentials until broader sample-mode coverage is complete.
+
 ## Condensed Project Milestones
 
 - 2026-04-15: Horizon Core 1.0.0 launched with customizable bento dashboard, dark/light themes, global settings search, and initial Loopia, Cloudflare, Plex, Immich, and Home Assistant support.

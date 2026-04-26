@@ -200,6 +200,24 @@ Source documents: README, CHANGELOG, DEVELOPING_PLUGINS, `.assistant/canvas/*`, 
 **Out of Scope:**
 - Full connected-mode implementation for all modules.
 
+## P-015: Polish First-Build Dashboard Defaults
+
+- **Status:** Done
+- **Priority:** Now
+- **Tags:** first-run, dashboard, layout, ux
+- **Reference:** User screenshot from first build; `lib/settings.ts`; `data/settings.json`; `app/page.tsx`
+- **Effort Estimate:** 1 day
+- **Depends on:** P-009
+
+**Acceptance Criteria:**
+- [x] Fresh default settings use explicit React Grid Layout objects instead of bare widget id strings.
+- [x] Legacy string layouts are normalized before rendering so older settings do not collapse widgets.
+- [x] First-build dashboard uses widgets that render without private service credentials.
+- [x] Bundled `data/settings.json` matches the first-run sample dashboard.
+
+**Out of Scope:**
+- Full sample-mode migration for every module.
+
 ## P-011: Configure Built-In Modules Through The UI
 
 - **Status:** Todo
